@@ -331,7 +331,7 @@ class EventsExt extends Events
                                         $newStart = Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $objEvents->startTime)
                                             . ' ' . $arrEventSkipInfo[$objEvents->id][$r]['new_start'];
                                         $newEnd = Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $objEvents->endTime)
-                                            . ' ' . $arrEventSkipInfo[$objEvents->id][$r]['new_end'];
+                                            . ' ' . ($arrEventSkipInfo[$objEvents->id][$r]['new_end'] ?: $arrEventSkipInfo[$objEvents->id][$r]['new_start']);
 
                                         //set the new values
                                         $objEvents->startTime = strtotime($newDate, strtotime($newStart));
