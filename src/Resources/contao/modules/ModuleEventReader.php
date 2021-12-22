@@ -225,7 +225,7 @@ class ModuleEventReader extends EventsExt
     if ((int)$objEvent->ignoreEndTime === 1) {
       // $strDate = \Date::parse($objPage->datimFormat, $objEvent->startTime) . $GLOBALS['TL_LANG']['MSC']['cal_timeSeparator'] . \Date::parse($objPage->dateFormat, $objEvent->endTime);
       // $strTime = null;
-      $strDate = \Date::parse($objPage->dateFormat, $objEvent->startTime);
+      $strDate = \Date::parse($objPage->dateFormat, $intStartTime);
       $objEvent->endTime = '';
       $objEvent->time = '';
     }
