@@ -616,7 +616,7 @@ class tl_calendar_events_ext extends \Backend
         }
 
         $maxCount = ($GLOBALS['TL_CONFIG']['tl_calendar_events']['maxRepeatExceptions']) ? $GLOBALS['TL_CONFIG']['tl_calendar_events']['maxRepeatExceptions'] : 365;
-        $maxELCount = 250;
+        $maxELCount = 500;
 
         $arrSet['weekday'] = (int)date("w", $dc->activeRecord->startDate);
         $arrSet['startTime'] = (int)$dc->activeRecord->startDate;
