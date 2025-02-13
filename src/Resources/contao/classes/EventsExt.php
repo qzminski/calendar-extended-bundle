@@ -46,7 +46,7 @@ class EventsExt extends Events
      */
     protected function compile()
     {
-        parent::compile;
+        // noop
     }
 
 
@@ -56,10 +56,11 @@ class EventsExt extends Events
      * @param array $arrCalendars
      * @param int $intStart
      * @param int $intEnd
+     * @param null $blnFeatured
      * @return array
      * @throws \Exception
      */
-    protected function getAllEvents($arrCalendars, $intStart, $intEnd)
+    protected function getAllEvents($arrCalendars, $intStart, $intEnd, $blnFeatured = null)
     {
         return $this->getAllEventsExt($arrCalendars, $intStart, $intEnd, array(null, true));
     }
