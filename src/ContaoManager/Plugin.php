@@ -14,10 +14,10 @@ namespace Kmielke\CalendarExtendedBundle\ContaoManager;
 
 use Contao\CalendarBundle\ContaoCalendarBundle;
 use Contao\CoreBundle\ContaoCoreBundle;
+use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Kmielke\CalendarExtendedBundle\CalendarExtendedBundle;
 
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
-use Contao\ManagerPlugin\Bundle\Contao\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use MenAtWork\MultiColumnWizardBundle\MultiColumnWizardBundle;
 
