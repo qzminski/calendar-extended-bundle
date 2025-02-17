@@ -1,14 +1,14 @@
-<?php 
+<?php
 
 /**
  * Contao Open Source CMS
- * 
+ *
  * Copyright (C) 2005-2012 Leo Feyer
- * 
- * @package   Contao 
- * @author    Kester Mielke 
- * @license   LGPL 
- * @copyright Kester Mielke 2010-2013 
+ *
+ * @package   Contao
+ * @author    Kester Mielke
+ * @license   LGPL
+ * @copyright Kester Mielke 2010-2013
  */
 
 $GLOBALS['TL_CONFIG']['tl_calendar_events']['maxRepeatExceptions'] = 365;
@@ -62,7 +62,6 @@ array_insert($GLOBALS['FE_MOD'], 99, array
     (
         'timetable'	        => 'Kmielke\CalendarExtendedBundle\ModuleTimeTable',
         'yearview'	        => 'Kmielke\CalendarExtendedBundle\ModuleYearView',
-        'evr_registration'  => 'Kmielke\CalendarExtendedBundle\ModuleEventRegistration',
         'fullcalendar'      => 'Kmielke\CalendarExtendedBundle\ModuleFullcalendar'
     )
 ));
@@ -81,25 +80,6 @@ array_insert($GLOBALS['BE_FFL'], 99, array
 (
     'timePeriodExt'     => 'Kmielke\CalendarExtendedBundle\TimePeriodExt',
 ));
-
-// config.php
-$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['event_registration'] = array
-(
-    // Type
-    'registration_status' => array(
-        'recipients'           => array('recipient_email', 'admin_email'),
-        'email_subject'        => array('page_title', 'recipient_*'),
-        'email_text'           => array('recipient_*', 'raw_data', ),
-        'email_html'           => array('recipient_*', 'raw_data', ),
-        'email_sender_name'    => array('admin_email', 'page_title'),
-        'email_sender_address' => array('admin_email'),
-        'email_recipient_cc'   => array('recipient_email'),
-        'email_recipient_bcc'  => array('recipient_email'),
-        'email_replyTo'        => array('recipient_email'),
-        'file_name'            => array('recipient_email'),
-        'file_content'         => array('recipient_email')
-    )
-);
 
 /**
  * Event Hook

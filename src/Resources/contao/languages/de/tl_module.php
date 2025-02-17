@@ -10,12 +10,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
@@ -64,10 +64,6 @@ $GLOBALS['TL_LANG']['tl_module']['time_range_from'] = array('Zeit von', 'Startze
 $GLOBALS['TL_LANG']['tl_module']['time_range_to']   = array('Zeit bis', 'Endzeit für den Stundenplan.');
 
 $GLOBALS['TL_LANG']['tl_module']['cellhight']       = array('Zellenhöhe eines Events', 'Höhe der Zelle eines Events in px pro Stunde. Standard ist 1px pro Minute und damit 60px bei einem Interval von 1 Stunde.');
-$GLOBALS['TL_LANG']['tl_module']['regform']         = array('Benachrichtigung', 'Wählen Sie eine Benachrichtigung aus.');
-$GLOBALS['TL_LANG']['tl_module']['regtype']         = array('Art der Bestätigung', 'Wählen Sie die art der Bestätigung aus.');
-$GLOBALS['TL_LANG']['tl_module']['regtypes'][1]     = 'Bestätigung Anmeldung';
-$GLOBALS['TL_LANG']['tl_module']['regtypes'][0]     = 'Bestätigung Abmeldung';
 $GLOBALS['TL_LANG']['tl_module']['ignore_urlparameter'] = array('URL Parameter nicht anhängen', 'Es werden keine Paramter (date, week, month, ...) an die Event URL gehängt.');
 
 $GLOBALS['TL_LANG']['tl_module']['filter_fields']   = array('Event Filterung', 'Felder auswählen, auf die im Frontend Template gefiltert werden kann.');
@@ -78,13 +74,6 @@ $GLOBALS['TL_LANG']['tl_module']['filter_fields']   = array('Event Filterung', '
 $GLOBALS['TL_LANG']['tl_module']['displayDurationError']    = 'strtotime Wert nicht lesbar.';
 $GLOBALS['TL_LANG']['tl_module']['displayDurationError2']   = 'strtotime Wert flasch. Ergibt aktuelles Datum.';
 $GLOBALS['TL_LANG']['tl_module']['config_ext_legend']       = 'Modul-Konfiguration (erweitert)';
-$GLOBALS['TL_LANG']['tl_module']['registration_legend']     = 'Anmeldung / Abmeldung (Benachrichtigung und Typ)';
 $GLOBALS['TL_LANG']['tl_module']['filter_legend']           = 'Filter';
-
-$GLOBALS['TL_LANG']['tl_module']['regerror']['param']       = 'Es ist ein Fehler mit den Parametern aufgetreten.';
-$GLOBALS['TL_LANG']['tl_module']['regerror']['noevt']       = 'Das Event ist nicht mehr vorhanden.';
-$GLOBALS['TL_LANG']['tl_module']['regerror']['daevt']       = 'Das Event ist zurzeit nicht aktiv.';
-$GLOBALS['TL_LANG']['tl_module']['regerror']['dline']       = 'Der Abmeldeschluss ist erreicht. Eine Abmeldung ist auf diesem Weg nicht mehr möglich.';
-$GLOBALS['TL_LANG']['tl_module']['regerror']['admin']       = 'Bitte kontaktieren Sie den Administrator.';
 
 $GLOBALS['TL_LANG']['tl_module']['fc_useGoCal']             = array('Google Kalendar', 'Einstellungen für die Nutzung eines Google Kalenders.');

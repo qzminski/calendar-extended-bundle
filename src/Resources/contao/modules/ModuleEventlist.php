@@ -206,12 +206,6 @@ class ModuleEventlist extends EventsExt
         // we have to check if we have to show recurrences and pass it to the getAllEventsExt function...
         $showRecurrences = ((int)$this->showRecurrences === 1) ? false : true;
 
-        if ('FE' === TL_MODE && true === FE_USER_LOGGED_IN) {
-            // calendar-extended-bundel assets
-            $assets_path = 'bundles/calendarextended/js';
-            $GLOBALS['TL_JAVASCRIPT'][] = $assets_path . '/event-register.js';
-        }
-
         // Get all events
         $arrAllEvents = $this->getAllEventsExt($this->cal_calendar, $strBegin, $strEnd, array($this->cal_holiday, $showRecurrences));
         $sort = ($this->cal_order == 'descending') ? 'krsort' : 'ksort';
@@ -284,35 +278,6 @@ class ModuleEventlist extends EventsExt
                     // Hide Events that are already started
                     if ($this->hide_started && $event['startTime'] < $currTime) {
                         continue;
-                    }
-
-                    // Show Register Info
-                    unset($event['reginfo']);
-                    if (class_exists('leads\leads') && $event['useRegistration']) {
-                        if ($event['regperson']) {
-                            $values = deserialize($event['regperson']);
-                            if (is_array($values)) {
-                                // Anmeldungen ermittlen und anzeigen
-                                $eid = (int)$event['id'];
-                                $fid = (int)$event['regform'];
-                                $regCount = CalendarLeadsModel::regCountByFormEvent($fid, $eid);
-
-                                // Werte setzen
-                                $values[0]['curr'] = (int)$regCount;
-                                $values[0]['mini'] = (int)$values[0]['mini'];
-                                $values[0]['maxi'] = (int)$values[0]['maxi'];
-                                $useMaxi = ($values[0]['maxi'] > 0) ? true : false;
-                                $values[0]['free'] = ($useMaxi) ? $values[0]['maxi'] - $values[0]['curr'] : 0;
-
-                                $event['reginfo']['mini'] = $values[0]['mini'];
-                                $event['reginfo']['maxi'] = $values[0]['maxi'];
-                                $event['reginfo']['curr'] = $values[0]['curr'];
-                                $event['reginfo']['free'] = $values[0]['free'];
-                                $event['class'] .= ($useMaxi && ($values[0]['free'] > 0)) ? ' regopen' : ' regclose';
-                                unset($arrsql);
-                            }
-                            unset($values);
-                        }
                     }
 
                     $event['firstDay'] = $GLOBALS['TL_LANG']['DAYS'][date('w', $day)];

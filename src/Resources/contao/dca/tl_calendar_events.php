@@ -33,25 +33,25 @@ if (class_exists('leads\leads')) {
     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = str_replace
     (
         '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{regform_legend},useRegistration;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
+        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
         $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default']
     );
     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['article'] = str_replace
     (
         '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{regform_legend},useRegistration;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
+        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
         $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['article']
     );
     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['internal'] = str_replace
     (
         '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{regform_legend},useRegistration;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
+        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
         $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['internal']
     );
     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['external'] = str_replace
     (
         '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{regform_legend},useRegistration;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
+        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
         $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['external']
     );
 } else {
@@ -84,7 +84,6 @@ if (class_exists('leads\leads')) {
 // change the default palettes
 array_insert($GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'], 99, 'recurringExt');
 array_insert($GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'], 99, 'useExceptions');
-array_insert($GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'], 99, 'useRegistration');
 
 // change the default palettes
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['recurring'] = str_replace
@@ -210,74 +209,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['hideOnWeekend'] = array
 // change the default palettes
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['recurringExt'] = 'repeatEachExt,recurrences,repeatEnd';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['useExceptions'] = 'repeatExceptionsInt,repeatExceptionsPer,repeatExceptions';
-$GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['useRegistration'] = 'regconfirm,regperson,regform,regstartdate,regenddate';
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['useRegistration'] = array
-(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['useRegistration'],
-    'exclude' => true,
-    'inputType' => 'checkbox',
-    'eval' => array('submitOnChange' => true, 'tl_class' => 'w50'),
-    'sql' => "char(1) NOT NULL default ''"
-);
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['regconfirm'] = array
-(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['regconfirm'],
-    'default' => 0,
-    'exclude' => true,
-    'inputType' => 'checkbox',
-    'eval' => array('tl_class' => 'w50 m12'),
-    'sql' => "char(1) NOT NULL default ''",
-);
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['regperson'] = array
-(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['regperson'],
-    'default' => 0,
-    'exclude' => true,
-    'filter' => false,
-    'inputType' => 'multiColumnWizard',
-    'load_callback' => array(array('tl_calendar_events_ext', 'getmaxperson')),
-    'eval' => array
-    (
-        'tl_class' => 'w50 clr',
-        'columnsCallback' => array('tl_calendar_events_ext', 'setmaxperson'),
-        'buttons' => array('add' => false, 'new' => false, 'up' => false, 'down' => false, 'delete' => false, 'copy' => false)
-    ),
-    'sql' => "blob NULL"
-);
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['regform'] = array
-(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['regform'],
-    'exclude' => true,
-    'filter' => true,
-    'inputType' => 'select',
-    'options_callback' => array('tl_calendar_events_ext', 'listRegForms'),
-    'eval' => array('mandatory' => true, 'tl_class' => 'w50 m12', 'includeBlankOption' => true, 'chosen' => true),
-    'sql' => "int(10) unsigned NOT NULL default '0'"
-);
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['regstartdate'] = array
-(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['regstartdate'],
-    'default' => time(),
-    'exclude' => true,
-    'inputType' => 'text',
-    'eval' => array('rgxp' => 'datim', 'mandatory' => false, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-    'sql' => "int(10) unsigned NULL"
-);
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['regenddate'] = array
-(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['regenddate'],
-    'default' => time(),
-    'exclude' => true,
-    'inputType' => 'text',
-    'eval' => array('rgxp' => 'datim', 'mandatory' => false, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-    'sql' => "int(10) unsigned NULL"
-);
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['recurringExt'] = array
 (
@@ -1087,82 +1018,6 @@ class tl_calendar_events_ext extends \Backend
         unset($maxRepeatEnd);
     }
 
-
-    /**
-     * @param $dc
-     * @return string
-     */
-    public function getmaxperson($var, $dc)
-    {
-        $values = deserialize($var);
-        if (!is_array($values)) {
-            $values = array();
-            $values[0]['mini'] = 0;
-            $values[0]['maxi'] = 0;
-            $values[0]['curr'] = 0;
-            $values[0]['free'] = 0;
-            return $values;
-        }
-
-        $eid = (int)$dc->activeRecord->id;
-        $fid = (int)$dc->activeRecord->regform;
-        $regCount = CalendarLeadsModel::regCountByFormEvent($fid, $eid);
-
-        $values[0]['curr'] = (int)$regCount;
-        $values[0]['mini'] = ($values[0]['mini']) ? (int)$values[0]['mini'] : 0;
-        $values[0]['maxi'] = ($values[0]['maxi']) ? (int)$values[0]['maxi'] : 0;
-        $useMaxi = ($values[0]['maxi'] > 0) ? true : false;
-        $values[0]['free'] = ($useMaxi) ? $values[0]['maxi'] - $values[0]['curr'] : 0;
-
-        return serialize($values);
-    }
-
-
-    /**
-     * @param $dc
-     * @return array
-     */
-    public function setmaxperson($dc)
-    {
-        $columnFields = null;
-
-        $columnFields = array
-        (
-            'mini' => array
-            (
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['mini'],
-                'default' => '0',
-                'exclude' => true,
-                'inputType' => 'text',
-                'eval' => array('style' => 'width:60px')
-            ),
-            'maxi' => array
-            (
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['maxi'],
-                'exclude' => true,
-                'inputType' => 'text',
-                'eval' => array('style' => 'width:60px')
-            ),
-            'curr' => array
-            (
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['curr'],
-                'exclude' => true,
-                'inputType' => 'text',
-                'eval' => array('style' => 'width:60px', 'disabled' => 'true')
-            ),
-            'free' => array
-            (
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['free'],
-                'exclude' => true,
-                'inputType' => 'text',
-                'eval' => array('style' => 'width:60px', 'disabled' => 'true')
-            )
-        );
-
-        return $columnFields;
-    }
-
-
     /**
      * listMultiExceptions()
      *
@@ -1371,29 +1226,4 @@ class tl_calendar_events_ext extends \Backend
 
         return $columnFields;
     }
-
-
-    /**
-     * @param $a
-     * @return array
-     */
-    public function listRegForms($a)
-    {
-        if ($this->User->isAdmin) {
-            $objForms = \FormModel::findAll();
-        } else {
-            $objForms = \FormModel::findMultipleByIds($this->User->forms);
-        }
-
-        $return = array();
-
-        if ($objForms !== null) {
-            while ($objForms->next()) {
-                $return[$objForms->id] = $objForms->title;
-            }
-        }
-
-        return $return;
-    }
-
 }

@@ -10,12 +10,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
@@ -64,10 +64,6 @@ $GLOBALS['TL_LANG']['tl_module']['time_range_from'] = array('Time from', 'Startt
 $GLOBALS['TL_LANG']['tl_module']['time_range_to']   = array('Time to', 'Endtime for timetable.');
 
 $GLOBALS['TL_LANG']['tl_module']['cellhight']       = array('Row height of events', 'Height of the cell of an event in px per hour. Standard is 1px per minute and thus 60px at an interval of 1 hour.');
-$GLOBALS['TL_LANG']['tl_module']['regform']         = array('Notifications', 'Please choose a notifications.');
-$GLOBALS['TL_LANG']['tl_module']['regtype']         = array('Kind of confirmation', 'Please choose the kind of the confirmation.');
-$GLOBALS['TL_LANG']['tl_module']['regtypes'][1]     = 'Confirm register';
-$GLOBALS['TL_LANG']['tl_module']['regtypes'][0]     = 'Confirm unregister';
 $GLOBALS['TL_LANG']['tl_module']['ignore_urlparameter'] = array('ignore url parameter', 'No parameter (date, week, month, ...) will be added to the URL.');
 
 $GLOBALS['TL_LANG']['tl_module']['filter_fields']   = array('Filtering events', 'Select fields that can be filtered in the frontend template.');
@@ -78,10 +74,3 @@ $GLOBALS['TL_LANG']['tl_module']['filter_fields']   = array('Filtering events', 
 $GLOBALS['TL_LANG']['tl_module']['displayDurationError']    = 'Error parsing strtotime value.';
 $GLOBALS['TL_LANG']['tl_module']['displayDurationError2']   = 'Error in strtotime value. Result is current day.';
 $GLOBALS['TL_LANG']['tl_module']['config_ext_legend']       = 'Module configuration (extended)';
-$GLOBALS['TL_LANG']['tl_module']['registration_legend']     = 'Register / Unregister (notification and type)';
-
-$GLOBALS['TL_LANG']['tl_module']['regerror']['param']       = 'There was an error with the parameters.';
-$GLOBALS['TL_LANG']['tl_module']['regerror']['noevt']       = 'The event is no longer present.';
-$GLOBALS['TL_LANG']['tl_module']['regerror']['daevt']       = 'The event is currently not active.';
-$GLOBALS['TL_LANG']['tl_module']['regerror']['dline']       = 'The registration deadline is reached. A cancellation is no longer possible in this way.';
-$GLOBALS['TL_LANG']['tl_module']['regerror']['admin']       = 'Please contact the administrator.';

@@ -64,26 +64,9 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['eventreader'] = str_replace
     $GLOBALS['TL_DCA']['tl_module']['palettes']['eventreader']
 );
 
-// Palette for registration
-$GLOBALS['TL_DCA']['tl_module']['palettes']['evr_registration'] = '{title_legend},name,headline,type;{registration_legend},nc_notification,regtype;{filter_legend},filter_fields';
-//'{redirect_legend},jumpTo;{template_legend:hide},cal_ctemplate,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
-
 /**
  * Add fields to tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['fields']['regtype'] = array
-(
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['regtype'],
-    'exclude' => true,
-    'filter' => true,
-    'default' => 0,
-    'inputType' => 'radio',
-    'options' => array(1, 0),
-    'reference' => &$GLOBALS['TL_LANG']['tl_module']['regtypes'],
-    'eval' => array('tl_class' => 'w50 m12', 'chosen' => true),
-    'sql' => "char(1) NOT NULL default ''"
-);
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cal_calendar'] = array
 (
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cal_calendar'],
