@@ -56,17 +56,6 @@ $GLOBALS['TL_CONFIG']['tl_calendar_events']['filter']['location_plz'] = [];
 /**
  * Front end modules
  */
-array_insert($GLOBALS['FE_MOD'], 99, array
-(
-    'events' => array
-    (
-        'timetable'	        => 'Kmielke\CalendarExtendedBundle\ModuleTimeTable',
-        'yearview'	        => 'Kmielke\CalendarExtendedBundle\ModuleYearView',
-        'fullcalendar'      => 'Kmielke\CalendarExtendedBundle\ModuleFullcalendar'
-    )
-));
-
-// Replace Contao Module
 $GLOBALS['FE_MOD']['events']['calendar']    = 'Kmielke\CalendarExtendedBundle\ModuleCalendar';
 $GLOBALS['FE_MOD']['events']['eventlist']   = 'Kmielke\CalendarExtendedBundle\ModuleEventlist';
 $GLOBALS['FE_MOD']['events']['eventmenu']   = 'Kmielke\CalendarExtendedBundle\ModuleEventMenu';
@@ -76,7 +65,7 @@ $GLOBALS['FE_MOD']['events']['eventreader'] = 'Kmielke\CalendarExtendedBundle\Mo
  * BACK END FORM FIELDS
  */
 
-array_insert($GLOBALS['BE_FFL'], 99, array
+\Contao\ArrayUtil::arrayInsert($GLOBALS['BE_FFL'], 99, array
 (
     'timePeriodExt'     => 'Kmielke\CalendarExtendedBundle\TimePeriodExt',
 ));

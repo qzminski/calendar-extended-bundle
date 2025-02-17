@@ -12,11 +12,14 @@ declare(strict_types = 1);
 
 namespace Kmielke\CalendarExtendedBundle\ContaoManager;
 
+use Contao\CalendarBundle\ContaoCalendarBundle;
+use Contao\CoreBundle\ContaoCoreBundle;
 use Kmielke\CalendarExtendedBundle\CalendarExtendedBundle;
 
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
-use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
+use Contao\ManagerPlugin\Bundle\Contao\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
+use MenAtWork\MultiColumnWizardBundle\MultiColumnWizardBundle;
 
 /**
  * Plugin for the Contao Manager.
@@ -34,9 +37,9 @@ class Plugin implements BundlePluginInterface
             BundleConfig::create(CalendarExtendedBundle::class)
                 ->setLoadAfter(
                     [
-                        'Contao\CoreBundle\ContaoCoreBundle',
-                        'Contao\CalendarBundle\ContaoCalendarBundle',
-                        'MenAtWork\MultiColumnWizard'
+                        ContaoCoreBundle::class,
+                        ContaoCalendarBundle::class,
+                        MultiColumnWizardBundle::class,
                     ]
                 )
         ];

@@ -22,7 +22,7 @@ use Contao\CalendarModel;
 use Contao\Date;
 use Contao\Events;
 
-use Kmielke\CalendarExtendedBundle\CalendarEventsModelExt;
+use Contao\StringUtil;
 
 /**
  * Class EventExt
@@ -104,8 +104,8 @@ class EventsExt extends Events
 
             // Get the current "jumpTo" page
             if ($objCalendar !== null && $objCalendar->jumpTo && ($objTarget = $objCalendar->getRelated('jumpTo')) !== null) {
-                /** @var \PageModel $objTarget */
-                $strUrl = $objTarget->getFrontendUrl((\Config::get('useAutoItem') && !\Config::get('disableAlias')) ? '/%s' : '/events/%s');
+                /** @var \Contao\PageModel $objTarget */
+                $strUrl = $objTarget->getFrontendUrl((\Contao\Config::get('useAutoItem') && !\Contao\Config::get('disableAlias')) ? '/%s' : '/events/%s');
             }
 
             // Get the events of the current period
@@ -135,7 +135,7 @@ class EventsExt extends Events
                 // get the event filter data
                 $filter = [];
                 if ($this->filter_fields) {
-                    $filter_fields = deserialize($this->filter_fields);
+                    $filter_fields = StringUtil::deserialize($this->filter_fields);
                     foreach ($filter_fields as $field) {
                         $filter[$field] = $objEvents->$field;
                     }
@@ -144,7 +144,7 @@ class EventsExt extends Events
                 }
 
                 // Count irregular recurrences
-                $arrayFixedDates = deserialize($objEvents->repeatFixedDates) ? deserialize($objEvents->repeatFixedDates) : null;
+                $arrayFixedDates = StringUtil::deserialize($objEvents->repeatFixedDates) ? StringUtil::deserialize($objEvents->repeatFixedDates) : null;
                 if (!is_null($arrayFixedDates)) {
                     foreach ($arrayFixedDates as $fixedDate) {
                         if ($fixedDate['new_repeat']) {
@@ -164,10 +164,10 @@ class EventsExt extends Events
 
                 // check the repeat values
                 if ($objEvents->recurring) {
-                    $arrRepeat = deserialize($objEvents->repeatEach) ? deserialize($objEvents->repeatEach) : null;
+                    $arrRepeat = StringUtil::deserialize($objEvents->repeatEach) ? StringUtil::deserialize($objEvents->repeatEach) : null;
                 }
                 if ($objEvents->recurringExt) {
-                    $arrRepeat = deserialize($objEvents->repeatEachExt) ? deserialize($objEvents->repeatEachExt) : null;
+                    $arrRepeat = StringUtil::deserialize($objEvents->repeatEachExt) ? StringUtil::deserialize($objEvents->repeatEachExt) : null;
                 }
 
                 // we need a counter for the recurrences if noSpan is set
@@ -221,11 +221,11 @@ class EventsExt extends Events
 
                     // now we have to take care about the exception dates to skip
                     if ($objEvents->useExceptions) {
-                        $arrEventSkipInfo[$objEvents->id] = deserialize($objEvents->exceptionList);
+                        $arrEventSkipInfo[$objEvents->id] = StringUtil::deserialize($objEvents->exceptionList);
                     }
 
                     // get the configured weekdays if any
-                    $useWeekdays = ($weekdays = deserialize($objEvents->repeatWeekday)) ? true : false;
+                    $useWeekdays = ($weekdays = StringUtil::deserialize($objEvents->repeatWeekday)) ? true : false;
 
                     // time of the next event
                     $nextTime = $objEvents->endTime;
@@ -418,13 +418,13 @@ class EventsExt extends Events
                             // new start time
                             $strNewDate = $fixedDate['new_repeat'];
                             $strNewTime = (strlen($fixedDate['new_start']) ? date('H:i', $fixedDate['new_start']) : $orgDateStart->time);
-                            $newDateStart = new Date(strtotime(date("d.m.Y", $strNewDate) . ' ' . $strNewTime), \Config::get('datimFormat'));
+                            $newDateStart = new Date(strtotime(date("d.m.Y", $strNewDate) . ' ' . $strNewTime), \Contao\Config::get('datimFormat'));
                             $objEvents->startTime = $newDateStart->timestamp;
                             $dateNextStart = date('Ymd', $objEvents->startTime);
 
                             // new end time
                             $strNewTime = (strlen($fixedDate['new_end']) ? date('H:i', $fixedDate['new_end']) : $orgDateEnd->time);
-                            $newDateEnd = new Date(strtotime(date("d.m.Y", $strNewDate) . ' ' . $strNewTime), \Config::get('datimFormat'));
+                            $newDateEnd = new Date(strtotime(date("d.m.Y", $strNewDate) . ' ' . $strNewTime), \Contao\Config::get('datimFormat'));
 
                             // use the multi-day span of the event
                             if ($orgDateSpan > 0) {
@@ -469,7 +469,7 @@ class EventsExt extends Events
                 $allowEvents = ($objAE->allowEvents === 1) ? true : false;
 
                 $strUrl = $this->strUrl;
-                $objCalendar = \CalendarModel::findByPk($id);
+                $objCalendar = \Contao\CalendarModel::findByPk($id);
 
                 // Get the current "jumpTo" page
                 if ($objCalendar !== null && $objCalendar->jumpTo && ($objTarget = $objCalendar->getRelated('jumpTo')) !== null) {

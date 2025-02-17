@@ -13,6 +13,10 @@
 
 namespace Kmielke\CalendarExtendedBundle;
 
+use Contao\BackendTemplate;
+use Contao\StringUtil;
+use Contao\System;
+
 /**
  * Class ModuleEventMenuExt
  *
@@ -30,17 +34,24 @@ class ModuleEventMenu extends ModuleCalendar
      */
     public function generate()
     {
-        if (TL_MODE == 'BE') {
-            /** @var \BackendTemplate|object $objTemplate */
-            $objTemplate = new \BackendTemplate('be_wildcard');
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
-            $objTemplate->wildcard = '### ' . utf8_strtoupper($GLOBALS['TL_LANG']['FMD']['eventmenu'][0]) . ' ###';
+        if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request))
+        {
+            $objTemplate = new BackendTemplate('be_wildcard');
+            $objTemplate->wildcard = '### ' . $GLOBALS['TL_LANG']['FMD']['eventmenu'][0] . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->href = StringUtil::specialcharsUrl(System::getContainer()->get('router')->generate('contao_backend', array('do'=>'themes', 'table'=>'tl_module', 'act'=>'edit', 'id'=>$this->id)));
 
             return $objTemplate->parse();
+        }
+
+        if ($this->cal_format == 'cal_day')
+        {
+            $this->strTemplate = 'mod_calendar';
+            $this->cal_ctemplate = 'cal_mini';
         }
 
         return parent::generate();
@@ -77,14 +88,14 @@ class ModuleEventMenu extends ModuleCalendar
     {
         $arrData = array();
 
-        if ($this->customTpl && TL_MODE == 'FE') { 
-            $strTemplate = $this->customTpl; 
+        if ($this->customTpl) {
+            $strTemplate = $this->customTpl;
         } else {
             $strTemplate = 'mod_eventmenu';
         }
 
-        /** @var \FrontendTemplate|object $objTemplate */
-        $objTemplate = new \FrontendTemplate($strTemplate);
+        /** @var \Contao\FrontendTemplate|object $objTemplate */
+        $objTemplate = new \Contao\FrontendTemplate($strTemplate);
 
         $this->Template = $objTemplate;
         $arrAllEvents = $this->getAllEventsExt($this->cal_calendar, 0, 2145913200, array($this->cal_holiday));
@@ -109,15 +120,15 @@ class ModuleEventMenu extends ModuleCalendar
 
             $arrItems[$intYear]['date'] = $intDate;
             $arrItems[$intYear]['link'] = $intYear;
-            $arrItems[$intYear]['href'] = $this->strLink . (\Config::get('disableAlias') ? '&amp;' : '?') . 'year=' . $intDate;
-            $arrItems[$intYear]['title'] = specialchars($intYear . ' (' . $quantity . ')');
+            $arrItems[$intYear]['href'] = $this->strLink . '?year=' . $intDate;
+            $arrItems[$intYear]['title'] = StringUtil::specialchars($intYear . ' (' . $quantity . ')');
             $arrItems[$intYear]['class'] = trim(((++$count == 1) ? 'first ' : '') . (($count == $limit) ? 'last' : ''));
-            $arrItems[$intYear]['isActive'] = (\Input::get('year') == $intDate);
+            $arrItems[$intYear]['isActive'] = (\Contao\Input::get('year') == $intDate);
             $arrItems[$intYear]['quantity'] = $quantity;
         }
 
         $this->Template->items = $arrItems;
-        $this->Template->showQuantity = ($this->cal_showQuantity !== '') ? true : false;
+        $this->Template->showQuantity = $this->cal_showQuantity;
         $this->Template->yearly = true;
     }
 
@@ -129,8 +140,8 @@ class ModuleEventMenu extends ModuleCalendar
     {
         $arrData = array();
 
-        /** @var \FrontendTemplate|object $objTemplate */
-        $objTemplate = new \FrontendTemplate('mod_eventmenu');
+        /** @var \Contao\FrontendTemplate|object $objTemplate */
+        $objTemplate = new \Contao\FrontendTemplate('mod_eventmenu');
 
         $this->Template = $objTemplate;
         $arrAllEvents = $this->getAllEventsExt($this->cal_calendar, 0, 2145913200, array($this->cal_holiday));
@@ -163,17 +174,17 @@ class ModuleEventMenu extends ModuleCalendar
 
                 $arrItems[$intYear][$intMonth]['date'] = $intDate;
                 $arrItems[$intYear][$intMonth]['link'] = $GLOBALS['TL_LANG']['MONTHS'][$intMonth] . ' ' . $intYear;
-                $arrItems[$intYear][$intMonth]['href'] = $this->strLink . (\Config::get('disableAlias') ? '&amp;' : '?') . 'month=' . $intDate;
-                $arrItems[$intYear][$intMonth]['title'] = specialchars($GLOBALS['TL_LANG']['MONTHS'][$intMonth] . ' ' . $intYear . ' (' . $quantity . ')');
+                $arrItems[$intYear][$intMonth]['href'] = $this->strLink . '?month=' . $intDate;
+                $arrItems[$intYear][$intMonth]['title'] = StringUtil::specialchars($GLOBALS['TL_LANG']['MONTHS'][$intMonth] . ' ' . $intYear . ' (' . $quantity . ')');
                 $arrItems[$intYear][$intMonth]['class'] = trim(((++$count == 1) ? 'first ' : '') . (($count == $limit) ? 'last' : ''));
-                $arrItems[$intYear][$intMonth]['isActive'] = (\Input::get('month') == $intDate);
+                $arrItems[$intYear][$intMonth]['isActive'] = (\Contao\Input::get('month') == $intDate);
                 $arrItems[$intYear][$intMonth]['quantity'] = $quantity;
             }
         }
 
         $this->Template->items = $arrItems;
-        $this->Template->showQuantity = ($this->cal_showQuantity != '') ? true : false;
-        $this->Template->url = $this->strLink . (\Config::get('disableAlias') ? '&amp;' : '?');
-        $this->Template->activeYear = \Input::get('year');
+        $this->Template->showQuantity = $this->cal_showQuantity;
+        $this->Template->url = $this->strLink . '?';
+        $this->Template->activeYear = \Contao\Input::get('year');
     }
 }

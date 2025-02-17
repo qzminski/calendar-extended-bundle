@@ -14,7 +14,7 @@
 foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'] as $k => $v) {
     if ($v[0] == 'tl_calendar_events' && $v[1] == 'adjustTime') {
         unset($GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][$k]);
-        array_insert($GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'], 0,
+        \Contao\ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'], 0,
             array(
                 array('tl_calendar_events_ext', 'adjustTime'),
                 array('tl_calendar_events_ext', 'checkOverlapping')
@@ -29,61 +29,34 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = str_replace
     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default']
 );
 
-if (class_exists('leads\leads')) {
-    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = str_replace
-    (
-        '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
-        $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default']
-    );
-    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['article'] = str_replace
-    (
-        '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
-        $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['article']
-    );
-    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['internal'] = str_replace
-    (
-        '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
-        $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['internal']
-    );
-    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['external'] = str_replace
-    (
-        '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
-        $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['external']
-    );
-} else {
-    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = str_replace
-    (
-        '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
-        $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default']
-    );
-    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['article'] = str_replace
-    (
-        '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
-        $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['article']
-    );
-    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['internal'] = str_replace
-    (
-        '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
-        $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['internal']
-    );
-    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['external'] = str_replace
-    (
-        '{recurring_legend},recurring;',
-        '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
-        $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['external']
-    );
-}
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = str_replace
+(
+    '{recurring_legend},recurring;',
+    '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
+    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default']
+);
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['article'] = str_replace
+(
+    '{recurring_legend},recurring;',
+    '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
+    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['article']
+);
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['internal'] = str_replace
+(
+    '{recurring_legend},recurring;',
+    '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
+    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['internal']
+);
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['external'] = str_replace
+(
+    '{recurring_legend},recurring;',
+    '{location_legend},location_name,location_str,location_plz,location_ort;{contact_legend},location_link,location_contact,location_mail;{recurring_legend},recurring;{recurring_legend_ext},recurringExt;{repeatFixedDates_legend},repeatFixedDates;{exception_legend},useExceptions;',
+    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['external']
+);
 
 // change the default palettes
-array_insert($GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'], 99, 'recurringExt');
-array_insert($GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'], 99, 'useExceptions');
+\Contao\ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'], 99, 'recurringExt');
+\Contao\ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'], 99, 'useExceptions');
 
 // change the default palettes
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['recurring'] = str_replace
@@ -383,7 +356,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['repeatEnd'] = array
     'sql' => "int(10) unsigned NOT NULL default '0'"
 );
 
-use Kmielke\CalendarExtendedBundle\CalendarLeadsModel;
 use Kmielke\CalendarExtendedBundle\CalendarEventsModelExt;
 
 /**
@@ -499,7 +471,7 @@ class tl_calendar_events_ext extends \Backend
         }
 
         // Check if we have time overlapping events
-        $uniqueEvents = (\CalendarModel::findById($dc->activeRecord->pid)->uniqueEvents) ? true : false;
+        $uniqueEvents = (\Contao\CalendarModel::findById($dc->activeRecord->pid)->uniqueEvents) ? true : false;
         if ($uniqueEvents) {
             // array for events
             $nonUniqueEvents = array();
@@ -592,7 +564,7 @@ class tl_calendar_events_ext extends \Backend
 
         // Set the repeatEnd date
         $arrFixDates = array();
-        $arrayFixedDates = deserialize($dc->activeRecord->repeatFixedDates) ? deserialize($dc->activeRecord->repeatFixedDates) : null;
+        $arrayFixedDates = \Contao\StringUtil::deserialize($dc->activeRecord->repeatFixedDates) ? \Contao\StringUtil::deserialize($dc->activeRecord->repeatFixedDates) : null;
         if (!is_null($arrayFixedDates)) {
             usort($arrayFixedDates, function ($a, $b) {
                 $intTimeStampA = strtotime($a["new_repeat"].$a['new_start']);
@@ -608,7 +580,7 @@ class tl_calendar_events_ext extends \Backend
 
                 // Check the date
                 try {
-                    $newDate = new \Date($fixedDate['new_repeat']);
+                    $newDate = new \Contao\Date($fixedDate['new_repeat']);
                 } catch (\Exception $e) {
                     return false;
                 }
@@ -629,8 +601,8 @@ class tl_calendar_events_ext extends \Backend
                 $arrAllRecurrences[$new_fix_start_date] = array(
                     'int_start' => $new_fix_start_date,
                     'int_end' => $new_fix_end_date,
-                    'str_start' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $new_fix_start_date),
-                    'str_end' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $new_fix_end_date)
+                    'str_start' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $new_fix_start_date),
+                    'str_end' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $new_fix_end_date)
                 );
                 $maxRepeatEnd[] = $new_fix_end_date;
             }
@@ -642,7 +614,7 @@ class tl_calendar_events_ext extends \Backend
 
         // changed default recurring
         if ($dc->activeRecord->recurring) {
-            $arrRange = deserialize($dc->activeRecord->repeatEach);
+            $arrRange = \Contao\StringUtil::deserialize($dc->activeRecord->repeatEach);
 
             $arg = $arrRange['value'] * $dc->activeRecord->recurrences;
             $unit = $arrRange['unit'];
@@ -663,8 +635,8 @@ class tl_calendar_events_ext extends \Backend
             $arrAllRecurrences[$next] = array(
                 'int_start' => $next,
                 'int_end' => $nextEnd,
-                'str_start' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $next),
-                'str_end' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $nextEnd)
+                'str_start' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $next),
+                'str_end' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $nextEnd)
             );
 
             if ($count == 0) {
@@ -692,8 +664,8 @@ class tl_calendar_events_ext extends \Backend
                 }
 
                 $value = (int)$arrRange['value'];
-                $wdays = (is_array(deserialize($dc->activeRecord->repeatWeekday)))
-                    ? deserialize($dc->activeRecord->repeatWeekday)
+                $wdays = (is_array(\Contao\StringUtil::deserialize($dc->activeRecord->repeatWeekday)))
+                    ? \Contao\StringUtil::deserialize($dc->activeRecord->repeatWeekday)
                     : false;
 
                 if ($unit === 'days' && $value === 1 && $wdays) {
@@ -716,8 +688,8 @@ class tl_calendar_events_ext extends \Backend
                     $arrAllRecurrences[$next] = array(
                         'int_start' => $next,
                         'int_end' => $nextEnd,
-                        'str_start' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $next),
-                        'str_end' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $nextEnd)
+                        'str_start' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $next),
+                        'str_end' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $nextEnd)
                     );
                 }
 
@@ -736,7 +708,7 @@ class tl_calendar_events_ext extends \Backend
 
         // extended version recurring
         if ($dc->activeRecord->recurringExt) {
-            $arrRange = deserialize($dc->activeRecord->repeatEachExt);
+            $arrRange = \Contao\StringUtil::deserialize($dc->activeRecord->repeatEachExt);
 
             $arg = $arrRange['value'];
             $unit = $arrRange['unit'];
@@ -760,8 +732,8 @@ class tl_calendar_events_ext extends \Backend
             $arrAllRecurrences[$next] = array(
                 'int_start' => $next,
                 'int_end' => $nextEnd,
-                'str_start' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $next),
-                'str_end' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $nextEnd)
+                'str_start' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $next),
+                'str_end' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $nextEnd)
             );
 
             if ($count > 0) {
@@ -787,8 +759,8 @@ class tl_calendar_events_ext extends \Backend
                     $arrAllRecurrences[$next] = array(
                         'int_start' => $next,
                         'int_end' => $nextEnd,
-                        'str_start' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $next),
-                        'str_end' => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $nextEnd)
+                        'str_start' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $next),
+                        'str_end' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $nextEnd)
                     );
 
                     //check if have the configured max value
@@ -846,7 +818,7 @@ class tl_calendar_events_ext extends \Backend
                 $unit = $GLOBALS['TL_CONFIG']['tl_calendar_events']['weekdays'][$dc->activeRecord->weekday];
 
                 // exception rules
-                $rows = deserialize($dc->activeRecord->repeatExceptionsInt);
+                $rows = \Contao\StringUtil::deserialize($dc->activeRecord->repeatExceptionsInt);
 
                 // run thru all dates
                 foreach ($rows as $row) {
@@ -899,10 +871,10 @@ class tl_calendar_events_ext extends \Backend
             // ... and last but not least by range
             if ($dc->activeRecord->repeatExceptionsPer) {
                 // exception rules
-                $rows = deserialize($dc->activeRecord->repeatExceptionsPer);
+                $rows = \Contao\StringUtil::deserialize($dc->activeRecord->repeatExceptionsPer);
 
                 // all recurrences...
-                $repeatDates = deserialize($dc->activeRecord->repeatDates);
+                $repeatDates = \Contao\StringUtil::deserialize($dc->activeRecord->repeatDates);
 
                 // run thru all dates
                 foreach ($rows as $row) {
@@ -937,7 +909,7 @@ class tl_calendar_events_ext extends \Backend
 
             // first we check the exceptions by date...
             if ($dc->activeRecord->repeatExceptions) {
-                $rows = deserialize($dc->activeRecord->repeatExceptions);
+                $rows = \Contao\StringUtil::deserialize($dc->activeRecord->repeatExceptions);
                 // set repeatEnd
                 // my be we have an exception move that is later then the repeatEnd
                 foreach ($rows as $row) {
@@ -978,8 +950,8 @@ class tl_calendar_events_ext extends \Backend
                             $arrAllRecurrences[$dateToFind] = array(
                                 'int_start'     => $dateToSave,
                                 'int_end'       => $dateToSaveEnd,
-                                'str_start'     => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $dateToSave),
-                                'str_end'       => \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $dateToSaveEnd),
+                                'str_start'     => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $dateToSave),
+                                'str_end'       => \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $dateToSaveEnd),
                                 'moveReason'    => ($row['reason']) ? $row['reason'] : ''
                             );
                         }
@@ -1035,23 +1007,23 @@ class tl_calendar_events_ext extends \Backend
         $arrSource3 = array();
         $arrSource4 = array();
 
-        if (\Input::get('id')) {
+        if (\Contao\Input::get('id')) {
             // Probably an AJAX request where activeRecord is not available
             if ($activeRecord === null) {
                 $activeRecord = \Database::getInstance()
                     ->prepare("SELECT * FROM {$var1->strTable} WHERE id=?")
                     ->limit(1)
-                    ->execute(\Input::get('id'))
+                    ->execute(\Contao\Input::get('id'))
                 ;
             }
 
             if ($activeRecord->repeatDates) {
-                $arrDates = deserialize($activeRecord->repeatDates);
+                $arrDates = \Contao\StringUtil::deserialize($activeRecord->repeatDates);
                 if (is_array($arrDates)) {
                     if ($var1->id == "repeatExceptions") {
                         // fill array for option date
                         foreach ($arrDates as $k => $arrDate) {
-                            $date = \Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $k);
+                            $date = \Contao\Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $k);
                             $arrSource1[$k] = $date;
                         }
                     }
@@ -1078,7 +1050,7 @@ class tl_calendar_events_ext extends \Backend
             $start = strtotime($start);
             $end = strtotime($end);
             while ($start <= $end) {
-                $newTime = \Date::parse($GLOBALS['TL_CONFIG']['timeFormat'], $start);
+                $newTime = \Contao\Date::parse($GLOBALS['TL_CONFIG']['timeFormat'], $start);
                 $arrSource4[$newTime] = $newTime;
                 $start = strtotime('+ ' . $interval . ' minutes', $start);
             }
@@ -1176,11 +1148,11 @@ class tl_calendar_events_ext extends \Backend
             );
 
             // add the field to the columnFields array
-            array_insert($columnFields, 0, array("exceptionTo" => $secondField));
+            \Contao\ArrayUtil::arrayInsert($columnFields, 0, array("exceptionTo" => $secondField));
         }
 
         // add the field to the columnFields array
-        array_insert($columnFields, 0, array("exception" => $firstField));
+        \Contao\ArrayUtil::arrayInsert($columnFields, 0, array("exception" => $firstField));
 
         return $columnFields;
     }

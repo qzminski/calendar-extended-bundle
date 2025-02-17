@@ -15,7 +15,7 @@ namespace Kmielke\CalendarExtendedBundle;
  *
  * @author    Kester Mielke <https://github.com/kmielke>
  */
-class CalendarEventsModelExt extends \CalendarEventsModel
+class CalendarEventsModelExt extends \Contao\CalendarEventsModel
 {
 
     /**
@@ -37,7 +37,7 @@ class CalendarEventsModelExt extends \CalendarEventsModel
         $arrColumns = array("$t.pid=? AND (($t.startTime>=$intStart AND $t.startTime<=$intEnd) OR ($t.endTime>=$intStart AND $t.endTime<=$intEnd) OR ($t.startTime<=$intStart AND $t.endTime>=$intEnd) OR (($t.recurring=1 OR $t.recurringExt=1) AND ($t.recurrences=0 OR $t.repeatEnd>=$intStart) AND $t.startTime<=$intEnd) OR ($t.repeatFixedDates is not null AND $t.repeatEnd>=$intStart))");
 
 		if (!static::isPreviewMode($arrOptions)) {
-            $time = \Date::floorToMinute();
+            $time = \Contao\Date::floorToMinute();
             $arrColumns[] = "($t.start='' OR $t.start<='$time') AND ($t.stop='' OR $t.stop>'" . ($time + 60) . "') AND $t.published='1'";
         }
 
@@ -66,7 +66,7 @@ class CalendarEventsModelExt extends \CalendarEventsModel
         }
 
         $t = static::$strTable;
-        $time = \Date::floorToMinute();
+        $time = \Contao\Date::floorToMinute();
 
         // Get upcoming events using endTime instead of startTime (see #3917)
         $arrColumns = array("($t.endTime>=$time OR (($t.recurring=1 OR $t.recurringExt=1) AND ($t.recurrences=0 OR $t.repeatEnd>=$time))) AND $t.pid IN(" . implode(',', array_map('intval', $arrIds)) . ") AND ($t.start='' OR $t.start<$time) AND ($t.stop='' OR $t.stop>$time) AND $t.published=1");
@@ -91,7 +91,7 @@ class CalendarEventsModelExt extends \CalendarEventsModel
      * @param integer $intEnd The end date as Unix timestamp
      * @param array $arrOptions An optional options array
      *
-     * @return \Model\Collection|\CalendarEventsModelExt[]|\CalendarEventsModelExt|null A collection of models or null if there are no events
+     * @return \Model\Collection|\Contao\CalendarEventsModelExt[]|\Contao\CalendarEventsModelExt|null A collection of models or null if there are no events
      */
     public static function findOverlappingByPid($intPid, $intStart, $intEnd, array $arrOptions = array())
     {
@@ -102,7 +102,7 @@ class CalendarEventsModelExt extends \CalendarEventsModel
         $arrColumns = array("$t.pid=? AND (($t.startTime>=$intStart AND $t.startTime<=$intEnd) OR ($t.endTime>=$intStart AND $t.endTime<=$intEnd) OR ($t.startTime<=$intStart AND $t.endTime>=$intEnd) OR (($t.recurring=1 OR $t.recurringExt=1) AND ($t.recurrences=0 OR $t.repeatEnd>=$intStart) AND $t.startTime<=$intEnd) OR ($t.repeatFixedDates is not null AND $t.repeatEnd>=$intStart))");
 
         if (!static::isPreviewMode($arrOptions)) {
-            $time = \Date::floorToMinute();
+            $time = \Contao\Date::floorToMinute();
             $arrColumns[] = "($t.start='' OR $t.start<='$time') AND ($t.stop='' OR $t.stop>'" . ($time + 60) . "') AND $t.published='1'";
         }
 

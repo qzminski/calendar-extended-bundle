@@ -22,8 +22,8 @@ $GLOBALS['TL_DCA']['tl_calendar']['palettes']['default'] = str_replace
     $GLOBALS['TL_DCA']['tl_calendar']['palettes']['default']
 );
 
-array_insert($GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'], 99, 'isHolidayCal');
-array_insert($GLOBALS['TL_DCA']['tl_calendar']['subpalettes'], 99, array('isHolidayCal' => 'allowEvents'));
+\Contao\ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'], 99, 'isHolidayCal');
+\Contao\ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_calendar']['subpalettes'], 99, array('isHolidayCal' => 'allowEvents'));
 
 // Hinzufügen der Feld-Konfiguration
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['bg_color'] = array

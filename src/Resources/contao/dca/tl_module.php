@@ -18,9 +18,6 @@
  */
 
 // Palette for calendar
-use Contao\Controller;
-use NotificationCenter\Model\Notification;
-
 $GLOBALS['TL_DCA']['tl_module']['palettes']['calendar'] = str_replace
 (
     ';{redirect_legend}',
@@ -28,24 +25,6 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['calendar'] = str_replace
     $GLOBALS['TL_DCA']['tl_module']['palettes']['calendar']
 );
 $GLOBALS['TL_DCA']['tl_module']['palettes']['calendar'] .= ';{filter_legend},filter_fields';
-
-// Palette for timetable
-$GLOBALS['TL_DCA']['tl_module']['palettes']['timetable'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['calendar'];
-$GLOBALS['TL_DCA']['tl_module']['palettes']['timetable'] = str_replace
-(
-    ';{redirect_legend}',
-    ',showDate,hideEmptyDays,use_navigation,linkCurrent,cal_times,cal_times_range,cellhight;{redirect_legend}',
-    $GLOBALS['TL_DCA']['tl_module']['palettes']['timetable']
-);
-
-// Palette for yearview
-$GLOBALS['TL_DCA']['tl_module']['palettes']['yearview'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['calendar'];
-$GLOBALS['TL_DCA']['tl_module']['palettes']['yearview'] = str_replace
-(
-    ';{redirect_legend}',
-    ',use_horizontal,use_navigation,linkCurrent;{protected_legend:hide}',
-    $GLOBALS['TL_DCA']['tl_module']['palettes']['yearview']
-);
 
 // Palette for eventlist
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventlist'] = str_replace
@@ -397,27 +376,6 @@ class calendar_Ext extends \Backend
         return $event_fields;
     }
 
-
-    /**
-     * @return array
-     */
-    public function listNotifications()
-    {
-        if (!class_exists('leads\leads')) {
-            return null;
-        }
-
-        $return = array();
-
-        $objNotifications = Notification::findAll();
-        if ($objNotifications !== null) {
-            while ($objNotifications->next()) {
-                $return[$objNotifications->id] = $objNotifications->title;
-            }
-        }
-
-        return $return;
-    }
 
 
     /**

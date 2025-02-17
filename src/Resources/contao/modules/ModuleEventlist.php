@@ -10,8 +10,14 @@
 
 namespace Kmielke\CalendarExtendedBundle;
 
-use Kmielke\CalendarExtendedBundle\EventsExt;
-use Kmielke\CalendarExtendedBundle\CalendarLeadsModel;
+use Contao\BackendTemplate;
+use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\Database;
+use Contao\Input;
+use Contao\Pagination;
+use Contao\StringUtil;
+use Contao\System;
 
 /**
  * Class ModuleEventListExt
@@ -25,7 +31,7 @@ class ModuleEventlist extends EventsExt
 
     /**
      * Current date object
-     * @var \Date
+     * @var \Contao\Date
      */
     protected $Date;
     protected $calConf = array();
@@ -44,21 +50,22 @@ class ModuleEventlist extends EventsExt
      */
     public function generate()
     {
-        if (TL_MODE == 'BE') {
-            /** @var \BackendTemplate|object $objTemplate */
-            $objTemplate = new \BackendTemplate('be_wildcard');
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
-            $objTemplate->wildcard = '### ' . utf8_strtoupper($GLOBALS['TL_LANG']['FMD']['eventlist'][0]) . ' ###';
+        if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request))
+        {
+            $objTemplate = new BackendTemplate('be_wildcard');
+            $objTemplate->wildcard = '### ' . $GLOBALS['TL_LANG']['FMD']['eventlist'][0] . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->href = StringUtil::specialcharsUrl(System::getContainer()->get('router')->generate('contao_backend', array('do'=>'themes', 'table'=>'tl_module', 'act'=>'edit', 'id'=>$this->id)));
 
             return $objTemplate->parse();
         }
 
-        $this->cal_calendar = $this->sortOutProtected(deserialize($this->cal_calendar, true));
-        $this->cal_holiday = $this->sortOutProtected(deserialize($this->cal_holiday, true));
+        $this->cal_calendar = $this->sortOutProtected(StringUtil::deserialize($this->cal_calendar, true));
+        $this->cal_holiday = $this->sortOutProtected(StringUtil::deserialize($this->cal_holiday, true));
 
         // Return if there are no calendars
         if (!is_array($this->cal_calendar) || empty($this->cal_calendar)) {
@@ -66,9 +73,9 @@ class ModuleEventlist extends EventsExt
         }
 
         // Calendar filter
-        if (\Input::get('cal')) {
+        if (\Contao\Input::get('cal')) {
             // Create array of cal_id's to filter
-            $cals1 = explode(',', \Input::get('cal'));
+            $cals1 = explode(',', \Contao\Input::get('cal'));
             // Check if the cal_id's are valid for this module
             $cals2 = array_intersect($cals1, $this->cal_calendar);
             if ($cals2) {
@@ -78,13 +85,13 @@ class ModuleEventlist extends EventsExt
 
         // Get the background and foreground colors of the calendars
         foreach (array_merge($this->cal_calendar, $this->cal_holiday) as $cal) {
-            $objBG = $this->Database->prepare("select title, bg_color, fg_color from tl_calendar where id = ?")
+            $objBG = Database::getInstance()->prepare("select title, bg_color, fg_color from tl_calendar where id = ?")
                 ->limit(1)->execute($cal);
 
             $this->calConf[$cal]['calendar'] = $objBG->title;
 
             if ($objBG->bg_color) {
-                list($cssColor, $cssOpacity) = deserialize($objBG->bg_color);
+                [$cssColor, $cssOpacity] = StringUtil::deserialize($objBG->bg_color);
 
                 if (!empty($cssColor)) {
                     $this->calConf[$cal]['background'] .= 'background-color:#' . $cssColor . ';';
@@ -95,7 +102,7 @@ class ModuleEventlist extends EventsExt
             }
 
             if ($objBG->fg_color) {
-                list($cssColor, $cssOpacity) = deserialize($objBG->fg_color);
+                [$cssColor, $cssOpacity] = StringUtil::deserialize($objBG->fg_color);
 
                 if (!empty($cssColor)) {
                     $this->calConf[$cal]['foreground'] .= 'color:#' . $cssColor . ';';
@@ -107,8 +114,16 @@ class ModuleEventlist extends EventsExt
         }
 
         // Show the event reader if an item has been selected
-        if ($this->cal_readerModule > 0 && (isset($_GET['events']) || (\Config::get('useAutoItem') && isset($_GET['auto_item'])))) {
+        if ($this->cal_readerModule > 0 && Input::get('auto_item') !== null)
+        {
             return $this->getFrontendModule($this->cal_readerModule, $this->strColumn);
+        }
+
+        // Tag the calendars (see #2137)
+        if (System::getContainer()->has('fos_http_cache.http.symfony_response_tagger'))
+        {
+            $responseTagger = System::getContainer()->get('fos_http_cache.http.symfony_response_tagger');
+            $responseTagger->addTags(array_map(static function ($id) { return 'contao.db.tl_calendar.' . $id; }, $this->cal_calendar));
         }
 
         return parent::generate();
@@ -120,13 +135,13 @@ class ModuleEventlist extends EventsExt
      */
     protected function compile()
     {
-        /** @var \PageModel $objPage */
+        /** @var \Contao\PageModel $objPage */
         global $objPage;
         $blnClearInput = false;
 
-        $intYear = \Input::get('year');
-        $intMonth = \Input::get('month');
-        $intDay = \Input::get('day');
+        $intYear = \Contao\Input::get('year');
+        $intMonth = \Contao\Input::get('month');
+        $intDay = \Contao\Input::get('day');
 
         // Jump to the current period
         if (!isset($_GET['year']) && !isset($_GET['month']) && !isset($_GET['day'])) {
@@ -152,27 +167,25 @@ class ModuleEventlist extends EventsExt
         // Create the date object
         try {
             if ($blnDynamicFormat && $intYear) {
-                $this->Date = new \Date($intYear, 'Y');
+                $this->Date = new \Contao\Date($intYear, 'Y');
                 $this->cal_format = 'cal_year';
                 $this->headline .= ' ' . date('Y', $this->Date->tstamp);
             } elseif ($blnDynamicFormat && $intMonth) {
-                $this->Date = new \Date($intMonth, 'Ym');
+                $this->Date = new \Contao\Date($intMonth, 'Ym');
                 $this->cal_format = 'cal_month';
-                $this->headline .= ' ' . \Date::parse('F Y', $this->Date->tstamp);
+                $this->headline .= ' ' . \Contao\Date::parse('F Y', $this->Date->tstamp);
             } elseif ($blnDynamicFormat && $intDay) {
-                $this->Date = new \Date($intDay, 'Ymd');
+                $this->Date = new \Contao\Date($intDay, 'Ymd');
                 $this->cal_format = 'cal_day';
-                $this->headline .= ' ' . \Date::parse($objPage->dateFormat, $this->Date->tstamp);
+                $this->headline .= ' ' . \Contao\Date::parse($objPage->dateFormat, $this->Date->tstamp);
             } else {
-                $this->Date = new \Date();
+                $this->Date = new \Contao\Date();
             }
-        } catch (\OutOfBoundsException $e) {
-            /** @var \PageError404 $objHandler */
-            $objHandler = new $GLOBALS['TL_PTY']['error_404']();
-            $objHandler->generate($objPage->id);
+        } catch (\OutOfBoundsException) {
+            throw new PageNotFoundException();
         }
 
-        list($strBegin, $strEnd, $strEmpty) = $this->getDatesFromFormat($this->Date, $this->cal_format);
+        [$strBegin, $strEnd, $strEmpty] = $this->getDatesFromFormat($this->Date, $this->cal_format);
 
         // we will overwrite $strBegin, $strEnd if cal_format_ext is set
         if ($this->cal_format_ext != '') {
@@ -188,7 +201,7 @@ class ModuleEventlist extends EventsExt
         }
 
         // we will overwrite $strBegin, $strEnd if range_date is set
-        $arrRange = deserialize($this->range_date);
+        $arrRange = StringUtil::deserialize($this->range_date);
         if (is_array($arrRange) && $arrRange[0]['date_from']) {
             $startRange = strtotime($arrRange[0]['date_from']);
             $endRange = strtotime($arrRange[0]['date_to']);
@@ -223,7 +236,7 @@ class ModuleEventlist extends EventsExt
         $dateEnd = date('Ymd', $strEnd);
 
         // Step 1: get the current time
-        $currTime = \Date::floorToMinute();
+        $currTime = \Contao\Date::floorToMinute();
         // Remove events outside the scope
         foreach ($arrAllEvents as $key => $days) {
             // Do not show recurrences
@@ -246,7 +259,7 @@ class ModuleEventlist extends EventsExt
                     }
 
                     // We have to get start and end from DB again, because start is overwritten in addEvent()
-                    $objEV = $this->Database->prepare("select start, stop from tl_calendar_events where id = ?")
+                    $objEV = Database::getInstance()->prepare("select start, stop from tl_calendar_events where id = ?")
                         ->limit(1)->execute($event['id']);
                     $eventStart = ($objEV->start) ? $objEV->start : false;
                     $eventStop = ($objEV->stop) ? $objEV->stop : false;
@@ -281,7 +294,7 @@ class ModuleEventlist extends EventsExt
                     }
 
                     $event['firstDay'] = $GLOBALS['TL_LANG']['DAYS'][date('w', $day)];
-                    $event['firstDate'] = \Date::parse($objPage->dateFormat, $day);
+                    $event['firstDate'] = \Contao\Date::parse($objPage->dateFormat, $day);
 //                    $event['datetime'] = date('Y-m-d', $day);
 
                     $event['calendar_title'] = $this->calConf[$event['pid']]['calendar'];
@@ -295,33 +308,33 @@ class ModuleEventlist extends EventsExt
 
                     // Set endtime to starttime always...
                     if ((int)$event['addTime'] === 1 && (int)$event['ignoreEndTime'] === 1) {
-                        $event['time'] = \Date::parse($objPage->timeFormat, $event['startTime']);
-//                        $event['date'] = \Date::parse($objPage->datimFormat, $event['startTime']) . ' - ' .   \Date::parse($objPage->dateFormat, $event['endTime']);
+                        $event['time'] = \Contao\Date::parse($objPage->timeFormat, $event['startTime']);
+//                        $event['date'] = \Contao\Date::parse($objPage->datimFormat, $event['startTime']) . ' - ' .   \Contao\Date::parse($objPage->dateFormat, $event['endTime']);
 //                        $event['endTime'] = '';
 //                        $event['time'] = '';
 //                        if ((int)$event['addTime'] === 1) {
-//                            $event['time'] = \Date::parse($objPage->timeFormat, $event['startTime']);
+//                            $event['time'] = \Contao\Date::parse($objPage->timeFormat, $event['startTime']);
 //                        }
                     }
 
                     // check the repeat values
                     $unit = '';
                     if ($event['recurring']) {
-                        $arrRepeat = deserialize($event['repeatEach']) ? deserialize($event['repeatEach']) : null;
+                        $arrRepeat = StringUtil::deserialize($event['repeatEach']) ? StringUtil::deserialize($event['repeatEach']) : null;
                         $unit = $arrRepeat['unit'];
                     }
                     if ($event['recurringExt']) {
-                        $arrRepeat = deserialize($event['repeatEachExt']) ? deserialize($event['repeatEachExt']) : null;
+                        $arrRepeat = StringUtil::deserialize($event['repeatEachExt']) ? StringUtil::deserialize($event['repeatEachExt']) : null;
                         $unit = $arrRepeat['unit'];
                     }
 
                     // get the configured weekdays if any
-                    $useWeekdays = ($weekdays = deserialize($event['repeatWeekday'])) ? true : false;
+                    $useWeekdays = ($weekdays = StringUtil::deserialize($event['repeatWeekday'])) ? true : false;
 
                     // Set the next date
                     $nextDate = null;
                     if ($event['repeatDates']) {
-                        $arrNext = deserialize($event['repeatDates']);
+                        $arrNext = StringUtil::deserialize($event['repeatDates']);
                         foreach ($arrNext as $k => $nextDate) {
                             if (strtotime($nextDate) > time()) {
                                 // check if we have the correct weekday
@@ -330,7 +343,7 @@ class ModuleEventlist extends EventsExt
                                         continue;
                                     }
                                 }
-                                $nextDate = \Date::parse($objPage->datimFormat, $k);
+                                $nextDate = \Contao\Date::parse($objPage->datimFormat, $k);
                                 break;
                             }
                         }
@@ -357,19 +370,17 @@ class ModuleEventlist extends EventsExt
         // Pagination
         if ($this->perPage > 0) {
             $id = 'page_e' . $this->id;
-            $page = (\Input::get($id) !== null) ? \Input::get($id) : 1;
+            $page = (\Contao\Input::get($id) !== null) ? \Contao\Input::get($id) : 1;
 
             // Do not index or cache the page if the page number is outside the range
             if ($page < 1 || $page > max(ceil($total / $this->perPage), 1)) {
-                /** @var \PageError404 $objHandler */
-                $objHandler = new $GLOBALS['TL_PTY']['error_404']();
-                $objHandler->generate($objPage->id);
+                throw new PageNotFoundException();
             }
 
             $offset = ($page - 1) * $this->perPage;
             $limit = min($this->perPage + $offset, $total);
 
-            $objPagination = new \Pagination($total, $this->perPage, \Config::get('maxPaginationLinks'), $id);
+            $objPagination = new Pagination($total, $this->perPage, \Contao\Config::get('maxPaginationLinks'), $id);
             $this->Template->pagination = $objPagination->generate("\n  ");
         }
 
@@ -383,7 +394,7 @@ class ModuleEventlist extends EventsExt
 
         // Override the default image size
         if ($this->imgSize != '') {
-            $size = deserialize($this->imgSize);
+            $size = StringUtil::deserialize($this->imgSize);
 
             if ($size[0] > 0 || $size[1] > 0 || is_numeric($size[2]) || ($size[2][0] ?? null) === '_') {
                 $imgSize = $this->imgSize;
@@ -400,8 +411,8 @@ class ModuleEventlist extends EventsExt
                 $blnIsLastEvent = true;
             }
 
-            /** @var \FrontendTemplate|object $objTemplate */
-            $objTemplate = new \FrontendTemplate($this->cal_template ?: 'event_list');
+            /** @var \Contao\FrontendTemplate|object $objTemplate */
+            $objTemplate = new \Contao\FrontendTemplate($this->cal_template ?: 'event_list');
             $objTemplate->setData($event);
 
             // Month header
@@ -428,7 +439,7 @@ class ModuleEventlist extends EventsExt
             // Add the template variables
             $objTemplate->classList = $event['class'] . ((($headerCount % 2) == 0) ? ' even' : ' odd') . (($headerCount == 0) ? ' first' : '') . ($blnIsLastEvent ? ' last' : '') . ' cal_' . $event['parent'];
             $objTemplate->classUpcoming = $event['class'] . ((($eventCount % 2) == 0) ? ' even' : ' odd') . (($eventCount == 0) ? ' first' : '') . ((($offset + $eventCount + 1) >= $limit) ? ' last' : '') . ' cal_' . $event['parent'];
-            $objTemplate->readMore = specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['readMore'], $event['title']));
+            $objTemplate->readMore = StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['readMore'], $event['title']));
             $objTemplate->more = $GLOBALS['TL_LANG']['MSC']['more'];
             $objTemplate->locationLabel = $GLOBALS['TL_LANG']['MSC']['location'];
 
@@ -442,22 +453,46 @@ class ModuleEventlist extends EventsExt
             }
 
             $objTemplate->addImage = false;
+            $objTemplate->addBefore = false;
 
             // Add an image
-            if ($event['addImage'] && $event['singleSRC'] != '') {
-                $objModel = \FilesModel::findByUuid($event['singleSRC']);
+            if ($event['addImage'])
+            {
+                $eventModel = CalendarEventsModel::findById($event['id']);
+                $imgSize = $eventModel->size ?: null;
 
-                if ($objModel === null) {
-                    if (!\Validator::isUuid($event['singleSRC'])) {
-                        $objTemplate->text = '<p class="error">' . $GLOBALS['TL_LANG']['ERR']['version2format'] . '</p>';
+                // Override the default image size
+                if ($this->imgSize)
+                {
+                    $size = StringUtil::deserialize($this->imgSize);
+
+                    if ($size[0] > 0 || $size[1] > 0 || is_numeric($size[2]) || ($size[2][0] ?? null) === '_')
+                    {
+                        $imgSize = $this->imgSize;
                     }
-                } elseif (is_file(TL_ROOT . '/' . $objModel->path)) {
-                    if ($imgSize) {
-                        $event['size'] = $imgSize;
+                }
+
+                $figureBuilder = System::getContainer()->get('contao.image.studio')->createFigureBuilder();
+
+                $figure = $figureBuilder
+                    ->from($event['singleSRC'])
+                    ->setSize($imgSize)
+                    ->setOverwriteMetadata($eventModel->getOverwriteMetadata())
+                    ->enableLightbox($eventModel->fullsize)
+                    ->buildIfResourceExists();
+
+                if (null !== $figure)
+                {
+                    // Rebuild with link to event if none is set
+                    if (!$figure->getLinkHref())
+                    {
+                        $figure = $figureBuilder
+                            ->setLinkHref($event['href'])
+                            ->setLinkAttribute('title', $objTemplate->readMore)
+                            ->build();
                     }
 
-                    $event['singleSRC'] = $objModel->path;
-                    $this->addImageToTemplate($objTemplate, $event);
+                    $figure->applyLegacyTemplateData($objTemplate, null, $eventModel->floating);
                 }
             }
 
@@ -487,9 +522,9 @@ class ModuleEventlist extends EventsExt
 
         // Clear the $_GET array (see #2445)
         if ($blnClearInput) {
-            \Input::setGet('year', null);
-            \Input::setGet('month', null);
-            \Input::setGet('day', null);
+            \Contao\Input::setGet('year', null);
+            \Contao\Input::setGet('month', null);
+            \Contao\Input::setGet('day', null);
         }
     }
 }

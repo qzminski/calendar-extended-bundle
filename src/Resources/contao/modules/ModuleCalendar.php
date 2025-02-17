@@ -10,6 +10,18 @@
 
 namespace Kmielke\CalendarExtendedBundle;
 
+use Contao\BackendTemplate;
+use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\Database;
+use Contao\Date;
+use Contao\Environment;
+use Contao\FrontendTemplate;
+use Contao\Input;
+use Contao\PageModel;
+use Contao\StringUtil;
+use Contao\System;
+use Symfony\Component\Routing\Exception\ExceptionInterface;
+
 /**
  * Front end module "calendar".
  *
@@ -20,7 +32,7 @@ class ModuleCalendar extends EventsExt
 
     /**
      * Current date object
-     * @var \Date
+     * @var \Contao\Date
      */
     protected $Date;
     protected $calConf = array();
@@ -46,21 +58,22 @@ class ModuleCalendar extends EventsExt
      */
     public function generate()
     {
-        if (TL_MODE === 'BE') {
-            /** @var \BackendTemplate|object $objTemplate */
-            $objTemplate = new \BackendTemplate('be_wildcard');
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
-            $objTemplate->wildcard = '### ' . utf8_strtoupper($GLOBALS['TL_LANG']['FMD']['calendar'][0]) . ' ###';
+        if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request))
+        {
+            $objTemplate = new BackendTemplate('be_wildcard');
+            $objTemplate->wildcard = '### ' . $GLOBALS['TL_LANG']['FMD']['calendar'][0] . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->href = StringUtil::specialcharsUrl(System::getContainer()->get('router')->generate('contao_backend', array('do'=>'themes', 'table'=>'tl_module', 'act'=>'edit', 'id'=>$this->id)));
 
             return $objTemplate->parse();
         }
 
-        $this->cal_calendar = $this->sortOutProtected(deserialize($this->cal_calendar, true));
-        $this->cal_holiday = $this->sortOutProtected(deserialize($this->cal_holiday, true));
+        $this->cal_calendar = $this->sortOutProtected(StringUtil::deserialize($this->cal_calendar, true));
+        $this->cal_holiday = $this->sortOutProtected(StringUtil::deserialize($this->cal_holiday, true));
 
         // Return if there are no calendars
         if (!is_array($this->cal_calendar) || empty($this->cal_calendar)) {
@@ -68,9 +81,9 @@ class ModuleCalendar extends EventsExt
         }
 
         // Calendar filter
-        if (\Input::get('cal')) {
+        if (\Contao\Input::get('cal')) {
             // Create array of cal_id's to filter
-            $cals1 = explode(',', \Input::get('cal'));
+            $cals1 = explode(',', \Contao\Input::get('cal'));
             // Check if the cal_id's are valid for this module
             $cals2 = array_intersect($cals1, $this->cal_calendar);
             if ($cals2) {
@@ -80,13 +93,12 @@ class ModuleCalendar extends EventsExt
 
         // Get the background and foreground colors of the calendars
         foreach (array_merge($this->cal_calendar, $this->cal_holiday) as $cal) {
-            $objBG = $this->Database->prepare("select title, bg_color, fg_color from tl_calendar where id = ?")
-                ->limit(1)->execute($cal);
+            $objBG = Database::getInstance()->prepare("select title, bg_color, fg_color from tl_calendar where id = ?")->limit(1)->execute($cal);
 
             $this->calConf[$cal]['calendar'] = $objBG->title;
 
             if ($objBG->bg_color) {
-                list($cssColor, $cssOpacity) = deserialize($objBG->bg_color);
+                [$cssColor, $cssOpacity] = StringUtil::deserialize($objBG->bg_color);
 
                 if (!empty($cssColor)) {
                     $this->calConf[$cal]['background'] .= 'background-color:#' . $cssColor . ';';
@@ -97,7 +109,7 @@ class ModuleCalendar extends EventsExt
             }
 
             if ($objBG->fg_color) {
-                list($cssColor, $cssOpacity) = deserialize($objBG->fg_color);
+                [$cssColor, $cssOpacity] = StringUtil::deserialize($objBG->fg_color);
 
                 if (!empty($cssColor)) {
                     $this->calConf[$cal]['foreground'] .= 'color:#' . $cssColor . ';';
@@ -108,12 +120,26 @@ class ModuleCalendar extends EventsExt
             }
         }
 
-        $this->strUrl = preg_replace('/\?.*$/', '', \Environment::get('request'));
+        $this->strUrl = preg_replace('/\?.*$/', '', \Contao\Environment::get('request'));
         $this->strLink = $this->strUrl;
 
-        if ($this->jumpTo && ($objTarget = $this->objModel->getRelated('jumpTo')) !== null) {
-            /** @var \PageModel $objTarget */
-            $this->strLink = $objTarget->getFrontendUrl();
+        if ($objTarget = PageModel::findById($this->objModel->jumpTo))
+        {
+            try
+            {
+                $this->strLink = System::getContainer()->get('contao.routing.content_url_generator')->generate($objTarget);
+            }
+            catch (ExceptionInterface)
+            {
+                // Ignore if target URL cannot be generated and use the current request URL
+            }
+        }
+
+        // Tag the calendars (see #2137)
+        if (System::getContainer()->has('fos_http_cache.http.symfony_response_tagger'))
+        {
+            $responseTagger = System::getContainer()->get('fos_http_cache.http.symfony_response_tagger');
+            $responseTagger->addTags(array_map(static function ($id) { return 'contao.db.tl_calendar.' . $id; }, $this->cal_calendar));
         }
 
         return parent::generate();
@@ -125,67 +151,99 @@ class ModuleCalendar extends EventsExt
      */
     protected function compile()
     {
-        // Create the date object
-        try {
-            if (\Input::get('month')) {
-                $this->Date = new \Date(\Input::get('month'), 'Ym');
-            } elseif (\Input::get('day')) {
-                $this->Date = new \Date(\Input::get('day'), 'Ymd');
-            } else {
-                $this->Date = new \Date();
-            }
-        } catch (\OutOfBoundsException $e) {
-            /** @var \PageModel $objPage */
-            global $objPage;
+        $month = Input::get('month');
+        $day = Input::get('day');
 
-            /** @var \PageError404 $objHandler */
-            $objHandler = new $GLOBALS['TL_PTY']['error_404']();
-            $objHandler->generate($objPage->id);
+        // Create the date object
+        try
+        {
+            if (\is_string($month))
+            {
+                $this->Date = new Date($month, 'Ym');
+            }
+            elseif (\is_string($day))
+            {
+                $this->Date = new Date($day, 'Ymd');
+            }
+            else
+            {
+                $this->Date = new Date();
+            }
+        }
+        catch (\OutOfBoundsException $e)
+        {
+            throw new PageNotFoundException('Page not found: ' . Environment::get('uri'));
         }
 
-        $time = \Date::floorToMinute();
+        $time = Date::floorToMinute();
 
         // Find the boundaries
-        $objMinMax = $this->Database->query("SELECT MIN(startTime) AS dateFrom, MAX(endTime) AS dateTo, MAX(repeatEnd) AS repeatUntil FROM tl_calendar_events WHERE pid IN(" . implode(',', array_map('intval', $this->cal_calendar)) . ")" . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<='$time') AND (stop='' OR stop>'" . ($time + 60) . "') AND published='1'" : ""));
+        $blnShowUnpublished = System::getContainer()->get('contao.security.token_checker')->isPreviewMode();
+        $objMinMax = Database::getInstance()->query("SELECT MIN(startTime) AS dateFrom, MAX(endTime) AS dateTo, MAX(repeatEnd) AS repeatUntil FROM tl_calendar_events WHERE pid IN(" . implode(',', array_map('\intval', $this->cal_calendar)) . ")" . (!$blnShowUnpublished ? " AND published=1 AND (start='' OR start<=$time) AND (stop='' OR stop>$time)" : ""));
+        $dateFrom = $objMinMax->dateFrom;
+        $dateTo = $objMinMax->dateTo;
+        $repeatUntil = $objMinMax->repeatUntil;
 
-        /** @var \FrontendTemplate|object $objTemplate */
-        $objTemplate = new \FrontendTemplate(($this->cal_ctemplate ? $this->cal_ctemplate : 'cal_default'));
+        if (isset($GLOBALS['TL_HOOKS']['findCalendarBoundaries']) && \is_array($GLOBALS['TL_HOOKS']['findCalendarBoundaries']))
+        {
+            foreach ($GLOBALS['TL_HOOKS']['findCalendarBoundaries'] as $callback)
+            {
+                System::importStatic($callback[0])->{$callback[1]}($dateFrom, $dateTo, $repeatUntil, $this);
+            }
+        }
+
+        $firstMonth = date('Ym', min($dateFrom, $time));
+        $lastMonth = date('Ym', max($dateTo, $repeatUntil, $time));
+
+        // The given month is out of scope
+        if ($month && ($month < $firstMonth || $month > $lastMonth))
+        {
+            throw new PageNotFoundException('Page not found: ' . Environment::get('uri'));
+        }
+
+        // The given day is out of scope
+        if ($day && ($day < date('Ymd', min($dateFrom, $time)) || $day > date('Ymd', max($dateTo, $repeatUntil, $time))))
+        {
+            throw new PageNotFoundException('Page not found: ' . Environment::get('uri'));
+        }
 
         // Store year and month
-        $intYear = date('Y', $this->Date->tstamp);
-        $intMonth = date('m', $this->Date->tstamp);
+        $intYear = (int) date('Y', $this->Date->tstamp);
+        $intMonth = (int) date('m', $this->Date->tstamp);
+
+        $objTemplate = new FrontendTemplate($this->cal_ctemplate ?: 'cal_default');
         $objTemplate->intYear = $intYear;
         $objTemplate->intMonth = $intMonth;
 
         // Previous month
-        $prevYear = ($intMonth <= 1) ? ($intYear - 1) : $intYear;
-        $prevMonth = ($intMonth <= 1) ? 12 : ($intMonth - 1);
-        $lblPrevious = $GLOBALS['TL_LANG']['MONTHS'][($prevMonth - 1)] . ' ' . $prevYear;
-        $intPrevYm = intval($prevYear . str_pad($prevMonth, 2, 0, STR_PAD_LEFT));
+        $prevMonth = ($intMonth == 1) ? 12 : ($intMonth - 1);
+        $prevYear = ($intMonth == 1) ? ($intYear - 1) : $intYear;
+        $lblPrevious = $GLOBALS['TL_LANG']['MONTHS'][$prevMonth - 1] . ' ' . $prevYear;
+        $intPrevYm = (int) ($prevYear . str_pad($prevMonth, 2, 0, STR_PAD_LEFT));
 
         // Only generate a link if there are events (see #4160)
         //if ($objMinMax->dateFrom !== null && $intPrevYm >= date('Ym', $objMinMax->dateFrom))
         //{
-        $objTemplate->prevHref = $this->strUrl . (\Config::get('disableAlias') ? '?id=' . \Input::get('id') . '&amp;' : '?') . 'month=' . $intPrevYm;
-        $objTemplate->prevTitle = specialchars($lblPrevious);
+        $objTemplate->prevHref = $this->strUrl . (\Contao\Config::get('disableAlias') ? '?id=' . \Contao\Input::get('id') . '&amp;' : '?') . 'month=' . $intPrevYm;
+        $objTemplate->prevTitle = StringUtil::specialchars($lblPrevious);
         $objTemplate->prevLink = $GLOBALS['TL_LANG']['MSC']['cal_previous'] . ' ' . $lblPrevious;
         $objTemplate->prevLabel = $GLOBALS['TL_LANG']['MSC']['cal_previous'];
         //}
 
         // Current month
-        $objTemplate->current = $GLOBALS['TL_LANG']['MONTHS'][(date('m', $this->Date->tstamp) - 1)] . ' ' . date('Y', $this->Date->tstamp);
+        $objTemplate->current = $GLOBALS['TL_LANG']['MONTHS'][date('m', $this->Date->tstamp) - 1] . ' ' . date('Y', $this->Date->tstamp);
 
         // Next month
-        $nextYear = ($intMonth >= 12) ? ($intYear + 1) : $intYear;
-        $nextMonth = ($intMonth >= 12) ? 1 : ($intMonth + 1);
-        $lblNext = $GLOBALS['TL_LANG']['MONTHS'][($nextMonth - 1)] . ' ' . $nextYear;
+        $nextMonth = ($intMonth == 12) ? 1 : ($intMonth + 1);
+        $nextYear = ($intMonth == 12) ? ($intYear + 1) : $intYear;
+        $lblNext = $GLOBALS['TL_LANG']['MONTHS'][$nextMonth - 1] . ' ' . $nextYear;
         $intNextYm = $nextYear . str_pad($nextMonth, 2, 0, STR_PAD_LEFT);
 
         // Only generate a link if there are events (see #4160)
         //if ($objMinMax->dateTo !== null && $intNextYm <= date('Ym', max($objMinMax->dateTo, $objMinMax->repeatUntil)))
         //{
-        $objTemplate->nextHref = $this->strUrl . (\Config::get('disableAlias') ? '?id=' . \Input::get('id') . '&amp;' : '?') . 'month=' . $intNextYm;
-        $objTemplate->nextTitle = specialchars($lblNext);
+        $objTemplate->nextHref = $this->strUrl . (\Contao\Config::get('disableAlias') ? '?id=' . \Contao\Input::get('id') . '&amp;' : '?') . 'month=' . $intNextYm;
+        $objTemplate->nextTitle = StringUtil::specialchars($lblNext);
         $objTemplate->nextLink = $lblNext . ' ' . $GLOBALS['TL_LANG']['MSC']['cal_next'];
         $objTemplate->nextLabel = $GLOBALS['TL_LANG']['MSC']['cal_next'];
 //		}
@@ -286,7 +344,7 @@ class ModuleCalendar extends EventsExt
             $strClass .= ((int)$intKey > (int)date('Ymd')) ? ' upcomming' : '';
 
             // Mark the selected day (see #1784)
-            if ($intKey === \Input::get('day')) {
+            if ($intKey === \Contao\Input::get('day')) {
                 $strClass .= ' selected';
             }
 
@@ -319,8 +377,8 @@ class ModuleCalendar extends EventsExt
             $arrDays[$strWeekClass][$i]['label'] = $intDay;
             $arrDays[$strWeekClass][$i]['class'] = 'days active' . $strClass;
             if (count($arrEvents) > 0) {
-                $arrDays[$strWeekClass][$i]['href'] = $this->strLink . (\Config::get('disableAlias') ? '&amp;' : '?') . 'day=' . $intKey;
-                $arrDays[$strWeekClass][$i]['title'] = sprintf(specialchars($GLOBALS['TL_LANG']['MSC']['cal_events']), count($arrEvents));
+                $arrDays[$strWeekClass][$i]['href'] = $this->strLink . '?day=' . $intKey;
+                $arrDays[$strWeekClass][$i]['title'] = sprintf(StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cal_events']), count($arrEvents));
                 $arrDays[$strWeekClass][$i]['events'] = $arrEvents;
             }
         }
