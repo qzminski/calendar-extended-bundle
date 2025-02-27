@@ -348,7 +348,7 @@ class EventsExt extends Events
                         // Skip events outside the scope
                         if ($objEvents->endTime < $intStart || $objEvents->startTime > $intEnd) {
                             // in case of a move we have to reset the original date
-                            if ($oldDate) {
+                            if ($oldDate ?? false) {
                                 $objEvents->startTime = $oldDate['startTime'];
                                 $objEvents->endTime = $oldDate['endTime'];
                             }
@@ -389,7 +389,7 @@ class EventsExt extends Events
                         $objEvents->oldEndTime = null;
 
                         // in case of a move we have to reset the original date
-                        if ($oldDate) {
+                        if ($oldDate ?? false) {
                             $objEvents->startTime = $oldDate['startTime'];
                             $objEvents->endTime = $oldDate['endTime'];
                         }
