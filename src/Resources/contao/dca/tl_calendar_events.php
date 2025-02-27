@@ -366,7 +366,7 @@ use Kmielke\CalendarExtendedBundle\CalendarEventsModelExt;
  * @author     Kester Mielke
  * @package    Controller
  */
-class tl_calendar_events_ext extends \Backend
+class tl_calendar_events_ext extends \Contao\Backend
 {
 
     /**
@@ -395,11 +395,11 @@ class tl_calendar_events_ext extends \Backend
     /**
      * Just check that only one option is active for recurring events
      * @param $varValue
-     * @param \DataContainer $dc
+     * @param \Contao\DataContainer $dc
      * @return mixed
      * @throws \Exception
      */
-    public function checkRecurring($varValue, \DataContainer $dc)
+    public function checkRecurring($varValue, \Contao\DataContainer $dc)
     {
         if ($varValue) {
             if ($dc->activeRecord->recurring && $dc->activeRecord->recurringExt) {
@@ -414,11 +414,11 @@ class tl_calendar_events_ext extends \Backend
     /**
      * Just check if any kind of recurring is in use
      * @param $varValue
-     * @param \DataContainer $dc
+     * @param \Contao\DataContainer $dc
      * @return mixed
      * @throws \Exception
      */
-    public function checkExceptions($varValue, \DataContainer $dc)
+    public function checkExceptions($varValue, \Contao\DataContainer $dc)
     {
         if ($varValue) {
             if (!$dc->activeRecord->recurring && !$dc->activeRecord->recurringExt) {
@@ -431,12 +431,12 @@ class tl_calendar_events_ext extends \Backend
 
 
     /**
-     * @param \DataContainer $dc
+     * @param \Contao\DataContainer $dc
      * @return mixed
      * @throws \Exception
      * @return boolean
      */
-    public function checkOverlapping(\DataContainer $dc)
+    public function checkOverlapping(\Contao\DataContainer $dc)
     {
         // Return if there is no active record (override all)
         if (!$dc->activeRecord) {
@@ -509,9 +509,9 @@ class tl_calendar_events_ext extends \Backend
 
 
     /**
-     * @param \DataContainer $dc
+     * @param \Contao\DataContainer $dc
      */
-    public function adjustTime(\DataContainer $dc)
+    public function adjustTime(\Contao\DataContainer $dc)
     {
         // Return if there is no active record (override all)
         if (!$dc->activeRecord) {
@@ -1010,7 +1010,7 @@ class tl_calendar_events_ext extends \Backend
         if (\Contao\Input::get('id')) {
             // Probably an AJAX request where activeRecord is not available
             if ($activeRecord === null) {
-                $activeRecord = \Database::getInstance()
+                $activeRecord = \Contao\Database::getInstance()
                     ->prepare("SELECT * FROM {$var1->strTable} WHERE id=?")
                     ->limit(1)
                     ->execute(\Contao\Input::get('id'))
