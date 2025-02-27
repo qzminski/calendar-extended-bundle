@@ -338,7 +338,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['filter_fields'] = array
  * @author     Kester Mielke
  * @package    Controller
  */
-class calendar_Ext extends \Backend
+class calendar_Ext extends \Contao\Backend
 {
 
     /**
@@ -357,8 +357,8 @@ class calendar_Ext extends \Backend
     public function getEventField()
     {
         // Load tl_calendar_events data
-        \Controller::loadDataContainer('tl_calendar_events');
-        \System::loadLanguageFile('tl_calendar_events');
+        \Contao\Controller::loadDataContainer('tl_calendar_events');
+        \Contao\System::loadLanguageFile('tl_calendar_events');
 
         // Get the event fields
         $arr_fields = ($GLOBALS['TL_CONFIG']['tl_calendar_events']['filter'])
