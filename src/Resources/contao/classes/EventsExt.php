@@ -484,6 +484,11 @@ class EventsExt extends Events
                 }
 
                 while ($objEvents->next()) {
+                    // Fix the endless loop caused by recurrences
+                    if (!$objEvents->recurrences) {
+                        $objEvents->recurrences = 1000;
+                    }
+
                     // at last we add the free multi-day / holiday or what ever kind of event
                     if (!$this->show_holiday) {
                         $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $strUrl, $intStart, $intEnd, $id);
