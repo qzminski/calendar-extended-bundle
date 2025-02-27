@@ -283,7 +283,7 @@ class EventsExt extends Events
                         }
 
                         // check if there is any exception
-                        if (is_array($arrEventSkipInfo[$objEvents->id])) {
+                        if (is_array($arrEventSkipInfo[$objEvents->id] ?? null)) {
                             // modify the css class of the exceptions
                             $objEvents->cssClass = $masterCSSClass;
                             unset($objEvents->moveReason);
