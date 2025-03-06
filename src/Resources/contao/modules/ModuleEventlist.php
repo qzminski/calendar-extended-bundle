@@ -14,6 +14,7 @@ use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\Database;
+use Contao\Events;
 use Contao\Input;
 use Contao\Pagination;
 use Contao\StringUtil;
@@ -503,6 +504,18 @@ class ModuleEventlist extends EventsExt
             if ($event['addEnclosure']) {
                 $this->addEnclosuresToTemplate($objTemplate, $event);
             }
+
+            // schema.org information
+            $objTemplate->getSchemaOrgData = static function () use ($event, $objTemplate): array {
+                $jsonLd = Events::getSchemaOrgData((new CalendarEventsModel())->setRow($event));
+
+                if ($objTemplate->addImage && $objTemplate->figure)
+                {
+                    $jsonLd['image'] = $objTemplate->figure->getSchemaOrgData();
+                }
+
+                return $jsonLd;
+            };
 
             $strEvents .= $objTemplate->parse();
 

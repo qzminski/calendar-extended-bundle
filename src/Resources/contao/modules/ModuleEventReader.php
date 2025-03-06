@@ -18,6 +18,7 @@ use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
 use Contao\CoreBundle\Util\UrlUtil;
 use Contao\Environment;
 
+use Contao\Events;
 use Contao\Input;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -466,7 +467,25 @@ class ModuleEventReader extends EventsExt
             $this->addEnclosuresToTemplate($objTemplate, $objEvent->row());
         }
 
+        // schema.org information
+        $objTemplate->getSchemaOrgData = static function () use ($objEvent, $objTemplate): array {
+            $jsonLd = Events::getSchemaOrgData($objEvent);
+
+            if ($objTemplate->addImage && $objTemplate->figure)
+            {
+                $jsonLd['image'] = $objTemplate->figure->getSchemaOrgData();
+            }
+
+            return $jsonLd;
+        };
+
         $this->Template->event = $objTemplate->parse();
+
+        // Tag the event (see #2137)
+        if (System::getContainer()->has('fos_http_cache.http.symfony_response_tagger')) {
+            $responseTagger = System::getContainer()->get('fos_http_cache.http.symfony_response_tagger');
+            $responseTagger->addTags(['contao.db.tl_calendar_events.'.$objEvent->id]);
+        }
 
         // HOOK: comments extension required
         if ($objEvent->noComments || !isset(System::getContainer()->getParameter('kernel.bundles')['ContaoCommentsBundle'])) {
