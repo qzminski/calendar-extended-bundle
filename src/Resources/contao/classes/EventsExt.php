@@ -296,7 +296,7 @@ class EventsExt extends Events
                             // store old date values for later reset
                             $oldDate = array();
 
-                            if (is_array($arrEventSkipInfo[$objEvents->id][$findDate])) {
+                            if (is_array($arrEventSkipInfo[$objEvents->id][$findDate] ?? null)) {
                                 // $r = $searchDate;
                                 $r = $findDate;
                                 $action = $arrEventSkipInfo[$objEvents->id][$r]['action'];
