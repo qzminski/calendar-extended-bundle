@@ -99,15 +99,6 @@ class EventsExt extends Events
         $arrEventSkipInfo = array();
 
         foreach ($arrCalendars as $id) {
-            $strUrl = $this->strUrl;
-            $objCalendar = CalendarModel::findByPk($id);
-
-            // Get the current "jumpTo" page
-            if ($objCalendar !== null && $objCalendar->jumpTo && ($objTarget = $objCalendar->getRelated('jumpTo')) !== null) {
-                /** @var \Contao\PageModel $objTarget */
-                $strUrl = $objTarget->getFrontendUrl((\Contao\Config::get('useAutoItem') && !\Contao\Config::get('disableAlias')) ? '/%s' : '/events/%s');
-            }
-
             // Get the events of the current period
             $objEvents = CalendarEventsModelExt::findCurrentByPid($id, $intStart, $intEnd);
 
@@ -181,7 +172,7 @@ class EventsExt extends Events
                 if ($store === true) {
                     $eventEnd = $objEvents->endTime;
 
-                    $this->addEvent($objEvents, $objEvents->startTime, $eventEnd, $strUrl, $intStart, $intEnd, $id);
+                    $this->addEvent($objEvents, $objEvents->startTime, $eventEnd, $intStart, $intEnd, $id);
 
                     // increase $cntRecurrences if event is in scope
                     if ($dateNextStart >= $dateBegin && $dateNextEnd <= $dateEnd) {
@@ -379,7 +370,7 @@ class EventsExt extends Events
                             }
                         }
                         if ($store === true && $addmonth === true) {
-                            $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $strUrl, $intStart, $intEnd, $id);
+                            $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
                         }
 
                         // reset this values...
@@ -440,7 +431,7 @@ class EventsExt extends Events
                             // position of the event
                             $objEvents->pos_idx++;
 
-                            $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $strUrl, $intStart, $intEnd, $id);
+                            $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
 
                             // restore the original values
                             $objEvents->startTime = $orgDateStart->timestamp;
@@ -468,14 +459,6 @@ class EventsExt extends Events
                     ->limit(1)->execute($id);
                 $allowEvents = ($objAE->allowEvents === 1) ? true : false;
 
-                $strUrl = $this->strUrl;
-                $objCalendar = \Contao\CalendarModel::findByPk($id);
-
-                // Get the current "jumpTo" page
-                if ($objCalendar !== null && $objCalendar->jumpTo && ($objTarget = $objCalendar->getRelated('jumpTo')) !== null) {
-                    $strUrl = $this->generateFrontendUrl($objTarget->row(), ($GLOBALS['TL_CONFIG']['useAutoItem'] ? '/%s' : '/events/%s'));
-                }
-
                 // Get the events of the current period
                 $objEvents = CalendarEventsModelExt::findCurrentByPid($id, $intStart, $intEnd);
 
@@ -491,7 +474,7 @@ class EventsExt extends Events
 
                     // at last we add the free multi-day / holiday or what ever kind of event
                     if (!$this->show_holiday) {
-                        $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $strUrl, $intStart, $intEnd, $id);
+                        $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
                     }
 
                     /**
