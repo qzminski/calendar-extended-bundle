@@ -172,7 +172,7 @@ class EventsExt extends Events
                 if ($store === true) {
                     $eventEnd = $objEvents->endTime;
 
-                    $this->addEvent($objEvents, $objEvents->startTime, $eventEnd, $intStart, $intEnd, $id);
+                    $this->addEvent($objEvents->current(), $objEvents->startTime, $eventEnd, $intStart, $intEnd, $id);
 
                     // increase $cntRecurrences if event is in scope
                     if ($dateNextStart >= $dateBegin && $dateNextEnd <= $dateEnd) {
@@ -370,7 +370,7 @@ class EventsExt extends Events
                             }
                         }
                         if ($store === true && $addmonth === true) {
-                            $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
+                            $this->addEvent($objEvents->current(), $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
                         }
 
                         // reset this values...
@@ -431,7 +431,7 @@ class EventsExt extends Events
                             // position of the event
                             $objEvents->pos_idx++;
 
-                            $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
+                            $this->addEvent($objEvents->current(), $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
 
                             // restore the original values
                             $objEvents->startTime = $orgDateStart->timestamp;
@@ -474,7 +474,7 @@ class EventsExt extends Events
 
                     // at last we add the free multi-day / holiday or what ever kind of event
                     if (!$this->show_holiday) {
-                        $this->addEvent($objEvents, $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
+                        $this->addEvent($objEvents->current(), $objEvents->startTime, $objEvents->endTime, $intStart, $intEnd, $id);
                     }
 
                     /**
