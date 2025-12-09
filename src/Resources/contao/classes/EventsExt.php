@@ -408,14 +408,14 @@ class EventsExt extends Events
 
                             // new start time
                             $strNewDate = $fixedDate['new_repeat'];
-                            $strNewTime = (strlen($fixedDate['new_start']) ? date('H:i', $fixedDate['new_start']) : $orgDateStart->time);
-                            $newDateStart = new Date(strtotime(date("d.m.Y", $strNewDate) . ' ' . $strNewTime), \Contao\Config::get('datimFormat'));
+                            $strNewTime = (strlen($fixedDate['new_start']) ? date('H:i', (int) $fixedDate['new_start']) : $orgDateStart->time);
+                            $newDateStart = new Date(strtotime(date("d.m.Y", (int) $strNewDate) . ' ' . $strNewTime), \Contao\Config::get('datimFormat'));
                             $objEvents->startTime = $newDateStart->timestamp;
                             $dateNextStart = date('Ymd', $objEvents->startTime);
 
                             // new end time
-                            $strNewTime = (strlen($fixedDate['new_end']) ? date('H:i', $fixedDate['new_end']) : $orgDateEnd->time);
-                            $newDateEnd = new Date(strtotime(date("d.m.Y", $strNewDate) . ' ' . $strNewTime), \Contao\Config::get('datimFormat'));
+                            $strNewTime = (strlen($fixedDate['new_end']) ? date('H:i', (int) $fixedDate['new_end']) : $orgDateEnd->time);
+                            $newDateEnd = new Date(strtotime(date("d.m.Y", (int) $strNewDate) . ' ' . $strNewTime), \Contao\Config::get('datimFormat'));
 
                             // use the multi-day span of the event
                             if ($orgDateSpan > 0) {
