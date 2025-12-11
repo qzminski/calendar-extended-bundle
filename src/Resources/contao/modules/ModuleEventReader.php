@@ -96,7 +96,7 @@ class ModuleEventReader extends EventsExt
         }
 
         // Get the current event
-        $objEvent = CalendarEventsModelExt::findPublishedByParentAndIdOrAlias(\Contao\Input::get('events'), $this->cal_calendar);
+        $objEvent = CalendarEventsModelExt::findPublishedByParentAndIdOrAlias(\Contao\Input::get('auto_item'), $this->cal_calendar);
 
         // The event does not exist (see #33)
         if ($objEvent === null) {
