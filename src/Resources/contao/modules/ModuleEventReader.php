@@ -375,8 +375,8 @@ class ModuleEventReader extends EventsExt
             $objEvent->allRecurrences = StringUtil::deserialize($objEvent->allRecurrences);
         }
 
-        /** @var \Contao\Contao\FrontendTemplate|object $objTemplate */
-        $objTemplate = new \Contao\Contao\FrontendTemplate($this->cal_template ?: 'event_full');
+        /** @var \Contao\FrontendTemplate|object $objTemplate */
+        $objTemplate = new \Contao\FrontendTemplate($this->cal_template ?: 'event_full');
         $objTemplate->setData($objEvent->row());
 
         $objTemplate->date = $strDate;
