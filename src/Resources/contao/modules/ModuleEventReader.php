@@ -507,7 +507,7 @@ class ModuleEventReader extends EventsExt
         $intHl = min(intval(str_replace('h', '', $this->hl)), 5);
         $this->Template->hlc = 'h'.($intHl + 1);
 
-        $this->import('Comments');
+        $this->import('Contao\Comments');
         $arrNotifies = [];
 
         // Notify the system administrator

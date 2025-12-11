@@ -375,7 +375,7 @@ class tl_calendar_events_ext extends \Contao\Backend
     public function __construct()
     {
         parent::__construct();
-        $this->import('BackendUser', 'User');
+        $this->import(\Contao\BackendUser::class, 'User');
     }
 
 
