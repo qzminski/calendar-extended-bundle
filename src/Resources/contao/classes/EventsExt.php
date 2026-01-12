@@ -195,7 +195,7 @@ class EventsExt extends Events
                  * if showRecurrences is false we do not need to go thru all recurring events...
                  */
                 if ((($objEvents->recurring && $objEvents->repeatEach) || ($objEvents->recurringExt && $objEvents->repeatEachExt)) && $showRecurrences) {
-                    if (is_null($arrRepeat)) {
+                    if (!is_array($arrRepeat) || empty($arrRepeat)) {
                         continue;
                     }
 
