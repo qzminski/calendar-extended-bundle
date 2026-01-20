@@ -973,7 +973,7 @@ class tl_calendar_events_ext extends \Contao\Backend
         }
 
         // Set the array of dates
-        if (is_array($arrDates) && is_array($arrFixDates)) {
+        if (is_array($arrDates ?? null) && is_array($arrFixDates)) {
             $arrAllDates = $arrDates + $arrFixDates;
             ksort($arrAllDates);
             $arrSet['repeatDates'] = $arrAllDates;
@@ -1171,21 +1171,42 @@ class tl_calendar_events_ext extends \Contao\Backend
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['exception'],
                 'exclude' => true,
                 'inputType' => 'text',
-                'eval' => array('rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => true, 'style' => 'width:100px', 'tl_class' => 'wizard')
+                'eval' => array('rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => true, 'style' => 'width:100px', 'tl_class' => 'wizard'),
+                'load_callback' => function ($value) {
+                    if ($value === null) {
+                        $value = '';
+                    }
+
+                    return $value;
+                }
             ),
             'new_start' => array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['new_start'],
                 'exclude' => true,
                 'inputType' => 'text',
-                'eval' => array('rgxp' => 'time', 'datepicker' => true, 'doNotCopy' => true, 'style' => 'width:40px')
+                'eval' => array('rgxp' => 'time', 'datepicker' => true, 'doNotCopy' => true, 'style' => 'width:40px'),
+                'load_callback' => function ($value) {
+                    if ($value === null) {
+                        $value = '';
+                    }
+
+                    return $value;
+                }
             ),
             'new_end' => array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['new_end'],
                 'exclude' => true,
                 'inputType' => 'text',
-                'eval' => array('rgxp' => 'time', 'datepicker' => true, 'doNotCopy' => true, 'style' => 'width:40px')
+                'eval' => array('rgxp' => 'time', 'datepicker' => true, 'doNotCopy' => true, 'style' => 'width:40px'),
+                'load_callback' => function ($value) {
+                    if ($value === null) {
+                        $value = '';
+                    }
+
+                    return $value;
+                }
             ),
             'reason' => array
             (
